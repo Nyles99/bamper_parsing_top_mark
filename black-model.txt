@@ -1,0 +1,92 @@
+Audi-100
+Audi-200
+Audi-80
+Audi-90
+Audi-A2
+Audi-Coupe
+Audi-Q2
+Audi-V8
+BMW-02 E10
+BMW-1 E87/E81/E82/E88
+BMW-3 E21
+BMW-3 E30
+BMW-3 E36
+BMW-3 E46
+BMW-3 E90/E91/E92/E93
+BMW-5 E12
+BMW-5 E28
+BMW-5 E34
+BMW-5 E39
+BMW-5 E60/E61
+BMW-6 E24
+BMW-6 E63/E64
+BMW-7 E23
+BMW-7 E32
+BMW-7 E38
+BMW-7 E65/E66
+BMW-8 E31
+BMW-X1 E84
+BMW-X3 E83
+BMW-X5 E53
+BMW-X5 E70
+BMW-X5 M E70
+BMW-X6 E71/E72
+BMW-Z1
+BMW-Z3
+BMW-Z8
+Mercedes-100
+Mercedes-1113
+Mercedes-1117
+Mercedes-1317
+Mercedes-1735
+Mercedes-1834
+Mercedes-1838
+Mercedes-1840
+Mercedes-190 W201
+Mercedes-207
+Mercedes-208
+Mercedes-210
+Mercedes-2538
+Mercedes-308
+Mercedes-310
+Mercedes-407
+Mercedes-408
+Mercedes-409
+Mercedes-410
+Mercedes-508
+Mercedes-608
+Mercedes-609
+Mercedes-611
+Mercedes-709
+Mercedes-711
+Mercedes-809
+Mercedes-811
+Mercedes-813
+Mercedes-814
+Mercedes-814D
+Mercedes-817
+Mercedes-A W168
+Mercedes-A W169
+Mercedes-Accelo
+Mercedes-Axor
+Mercedes-B W245
+Mercedes-C W202
+Mercedes-C W203
+Mercedes-Citan
+Mercedes-Citaro
+Mercedes-CL W140
+Mercedes-CL W215
+Mercedes-CLC
+Mercedes-CLK
+Mercedes-CLK W208
+Mercedes-CLK W209
+Mercedes-E W114
+Mercedes-E W115
+Mercedes-E W123
+Mercedes-E W124
+Mercedes-E W210
+Mercedes-E W211
+Mercedes-Econic
+Mercedes-G
+Mercedes-G W460
+Mercedes-G W463
