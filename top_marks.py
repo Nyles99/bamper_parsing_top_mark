@@ -50,7 +50,6 @@ driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
 
 summa = 0
 black_list = []
-black_mark = []
 black_model = []
 
 file1 = open("black-list.txt", "r")
@@ -67,6 +66,20 @@ while True:
 # закрываем файл
 file1.close
 
+file1 = open("black-model.txt", "r")
+while True:
+    # считываем строку
+    line = file1.readline()
+    line = line.replace("\n","").replace("'","").replace(" ","")
+    # прерываем цикл, если строка пустая
+    if not line:
+        break
+    # выводим строку
+    black_model.append(line)
+#print(black_list)
+# закрываем файл
+file1.close
+
 marka_need_list = {}
 model_need_list = {}       
 
@@ -76,55 +89,41 @@ with open('modelu.json', encoding="utf-8") as file:
 zapchast00_1200 = {}
 zapchast1200 = {}
 n=1
-
+zapchast_and_href = {}
 for item_text, item_href_model in catalog.items():
-    
-    item_text = item_text.replace("/","_")
-    item_href_model = str(item_href_model)
-    item_href = item_href_model[item_href_model.find("catalog/")+8 : len(item_href_model) -1]
-    print(item_href_model)
-    markah = item_href[: item_href.find("-")]
-    modelh = item_href[item_href.find("-") + 1 :]
-    print(markah, "     ", modelh)
-    url_categoria = item_href_model
-    #print(url_zapchast)
-    driver.get(url=url_categoria)
-    time.sleep(1)
+    if item_text not in black_model:
+        item_text = item_text.replace("/","_")
+        item_href_model = str(item_href_model)
+        item_href = item_href_model[item_href_model.find("catalog/")+8 : len(item_href_model) -1]
+        print(item_href_model)
+        markah = item_href[: item_href.find("-")]
+        modelh = item_href[item_href.find("-") + 1 :]
+        print(markah, "     ", modelh)
+        #print(url_zapchast)
+        driver.get(url=item_href_model)
+        time.sleep(1)
 
-    with open("2.html", "w", encoding="utf-8") as file:
-        file.write(driver.page_source)
+        with open("2.html", "w", encoding="utf-8") as file:
+            file.write(driver.page_source)
 
-    with open("2.html", encoding="utf-8") as file:
-        src = file.read()
+        with open("2.html", encoding="utf-8") as file:
+            src = file.read()
 
-    soup = BeautifulSoup(src, 'html.parser')
+        soup = BeautifulSoup(src, 'html.parser')
 
-    count = soup.find_all("a",  target="_blank")
-    #print(count)
-    for item in count:
-        if "img" not in str(item):
-            #print(item, "Новая строка")
-            href_group_part = "https://bamper.by"+item.get("href")
-            name_zap = item.text
-            """num_page = item[item.find("<b>")+3: item.find("</b>")]
-                num_page = int(num_page.replace(" ",""))
-                summa = summa + num_page
-                if num_page > 0 and num_page < 1201:
-                    page = int(num_page / 20) + 1
-                    zapchast00_1200[url_zapchast] = page
-                elif num_page > 1200:
-                    page = int(num_page / 20) + 1
-                    zapchast1200[url_zapchast] = page
+        count = soup.find_all("a",  target="_blank")
+        #print(count)
+        for item in count:
+            if "img" not in str(item):
+                #print(item, "Новая строка")
+                href_group_part = "https://bamper.by"+item.get("href")
+                name_zap = item.text
+                print(name_zap, href_group_part)
+                zapchast_and_href[href_group_part] = name_zap
 
-        os.remove(f"{item_text_model}.html") 
+        os.remove("2.html") 
 
-with open("zapchast00_1200.json", "a", encoding="utf-8") as file:
-    json.dump(zapchast00_1200, file, indent=4, ensure_ascii=False)
+with open("zapchast_and_href.json", "a", encoding="utf-8") as file:
+    json.dump(zapchast_and_href, file, indent=4, ensure_ascii=False)
 
-with open("zapchast1200.json", "a", encoding="utf-8") as file:
-    json.dump(zapchast1200, file, indent=4, ensure_ascii=False)
-
-
-print(summa)
-
-a = input("Нажмите 1 и ENTER, чтобы закончить это сумасшествие")"""
+a = input("Нажмите 1 и ENTER, чтобы закончить это сумасшествие")
