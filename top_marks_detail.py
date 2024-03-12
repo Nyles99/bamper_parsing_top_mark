@@ -96,6 +96,22 @@ for item_href_model, name_zap  in catalog.items():
         marka = marka_vxod
         model = item_href_model[item_href_model.find("model")+6 : -1]
         print( marka,  model)
-
+        i = 1
+        item_href_page = item_href_model + "?ACTION=REWRITED3&FORM_DATA=" + item_href_model[item_href_model.find("zchbu")+6 : item_href_model.find("/marka")] + "%2Fmarka_" + item_href_model[item_href_model.find("/marka")+7 : item_href_model.find("/model")] + "%2Fmodel_" + item_href_model[item_href_model.find("/model_")+7 : -1] + "&PAGEN_1=" + str(i)
+        print(item_href_page)
+        item_href_page = "https://bamper.by/zchbu/zapchast_zashchita-arok-podkrylok/marka_audi/model_a1/?ACTION=REWRITED3&FORM_DATA=zapchast_zashchita-arok-podkrylok%2Fmarka_audi%2Fmodel_a1&PAGEN_1=1"
+        req = requests.get(url=item_href_page, headers=headers)
+        src = req.text
+        soup = BeautifulSoup(src, 'html.parser')
+        href_part = soup.find_all("ul", class_="pagination")        
+        #print(href_part)
+        if "След." in str(href_part):
+            href_part = str(href_part)
+            #print(href_part)
+            print("переходим на следующую")
+            item_href_page = "https://bamper.by" + href_part[href_part.find("href=") + 6 : href_part.find(f">{int(i+1)}</a>") - 1]
+            print(item_href_page, "вот это!")
+            
+        break
 
 a = input("Нажмите 1 и ENTER, чтобы закончить это сумасшествие - ")
