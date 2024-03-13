@@ -89,6 +89,38 @@ marka_vxod_in = "marka_" + marka_vxod
 with open('zapchast_and_href.json', encoding="utf-8") as file:
     catalog = json.load(file)
 
+def osnova(href, n):
+    item_href_page = href[:-1]  + str(n)
+    print(item_href_page)
+    req = requests.get(url=item_href_page, headers=headers)
+    src = req.text
+    soup = BeautifulSoup(src, 'html.parser')
+    href_part = soup.find_all("div", class_="add-image")
+    #print(href_part)
+    for item in href_part:
+        item = str(item)
+        foto = " "
+        foto = "https://bamper.by" + item[item.find('"tooltip_" src=') + 16 : item.find('title="Нажми,') -2]
+        item = item[item.find("href")+7: item.find("target=") -2]
+        #print(foto)
+        href_to_zapchast = "https://bamper.by/" + item
+        print(href_to_zapchast)
+        number_href_reverse = item[::-1]
+        number_href_reverse_second = number_href_reverse[1:]
+        number_href_reverse = number_href_reverse_second[: number_href_reverse_second.find("/")]
+        name_href = number_href_reverse[::-1]
+        name_href = name_href.replace("*","_").replace('%','_')
+        #print(name_href)
+        num_provider = name_href[: name_href.find("-")]
+        print(num_provider)
+    href_part_pag = soup.find_all("ul", class_="pagination")
+    if "След." in str(href_part_pag):
+        href_part_pag = str(href_part_pag)
+        #print(href_part)
+        print("переходим на следующую")
+        n += 1
+        osnova(item_href_page, n)
+
 for item_href_model, name_zap  in catalog.items():
     if marka_vxod_in in item_href_model:
         print(item_href_model)
@@ -97,20 +129,24 @@ for item_href_model, name_zap  in catalog.items():
         model = item_href_model[item_href_model.find("model")+6 : -1]
         print( marka,  model)
         i = 1
-        item_href_page = item_href_model + "?ACTION=REWRITED3&FORM_DATA=" + item_href_model[item_href_model.find("zchbu")+6 : item_href_model.find("/marka")] + "%2Fmarka_" + item_href_model[item_href_model.find("/marka")+7 : item_href_model.find("/model")] + "%2Fmodel_" + item_href_model[item_href_model.find("/model_")+7 : -1] + "&PAGEN_1=" + str(i)
+        item_href_model = "https://bamper.by/zchbu/zapchast_zashchita-arok-podkrylok/marka_audi/model_a1/"
+        item_href_model = item_href_model + "?ACTION=REWRITED3&FORM_DATA=" + item_href_model[item_href_model.find("zchbu")+6 : item_href_model.find("/marka")] + "%2Fmarka_" + item_href_model[item_href_model.find("/marka")+7 : item_href_model.find("/model")] + "%2Fmodel_" + item_href_model[item_href_model.find("/model_")+7 : -1] + "&PAGEN_1=1"
+        osnova(item_href_model, i)
+        """item_href_page = item_href_model + "?ACTION=REWRITED3&FORM_DATA=" + item_href_model[item_href_model.find("zchbu")+6 : item_href_model.find("/marka")] + "%2Fmarka_" + item_href_model[item_href_model.find("/marka")+7 : item_href_model.find("/model")] + "%2Fmodel_" + item_href_model[item_href_model.find("/model_")+7 : -1] + "&PAGEN_1=" + str(i)
         print(item_href_page)
-        item_href_page = "https://bamper.by/zchbu/zapchast_zashchita-arok-podkrylok/marka_audi/model_a1/?ACTION=REWRITED3&FORM_DATA=zapchast_zashchita-arok-podkrylok%2Fmarka_audi%2Fmodel_a1&PAGEN_1=1"
+        item_href_page = "https://bamper.by/zchbu/zapchast_zashchita-arok-podkrylok/marka_audi/model_a1/?ACTION=REWRITED3&FORM_DATA=zapchast_zashchita-arok-podkrylok%2Fmarka_audi%2Fmodel_a1&PAGEN_1=1" 
         req = requests.get(url=item_href_page, headers=headers)
         src = req.text
         soup = BeautifulSoup(src, 'html.parser')
         href_part = soup.find_all("ul", class_="pagination")        
-        #print(href_part)
+        #print(href_part) 
         if "След." in str(href_part):
             href_part = str(href_part)
             #print(href_part)
             print("переходим на следующую")
-            item_href_page = "https://bamper.by" + href_part[href_part.find("href=") + 6 : href_part.find(f">{int(i+1)}</a>") - 1]
-            print(item_href_page, "вот это!")
+            i += 1
+            item_href_page = "https://bamper.by/zchbu/zapchast_zashchita-arok-podkrylok/marka_audi/model_a1/?ACTION=REWRITED3&FORM_DATA=zapchast_zashchita-arok-podkrylok%2Fmarka_audi%2Fmodel_a1&PAGEN_1=" + str(i)
+            print(item_href_page, "вот это!")"""
             
         break
 
