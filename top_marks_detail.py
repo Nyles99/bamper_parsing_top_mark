@@ -92,10 +92,11 @@ with open('zapchast_and_href.json', encoding="utf-8") as file:
 def osnova(href, n):
     item_href_page = href[:-1]  + str(n)
     print(item_href_page)
+    
     req = requests.get(url=item_href_page, headers=headers)
     src = req.text
-    soup = BeautifulSoup(src, 'html.parser')
-    href_part = soup.find_all("div", class_="add-image")
+    soup_1 = BeautifulSoup(src, 'html.parser')
+    href_part = soup_1.find_all("div", class_="add-image")
     #print(href_part)
     for item in href_part:
         item = str(item)
@@ -112,14 +113,109 @@ def osnova(href, n):
         name_href = name_href.replace("*","_").replace('%','_')
         #print(name_href)
         num_provider = name_href[: name_href.find("-")]
-        print(num_provider)
-    href_part_pag = soup.find_all("ul", class_="pagination")
+        #print(num_provider)
+        if num_provider not in black_list:
+            try:
+                req = requests.get(url=href_to_zapchast, headers=headers)
+                src = req.text
+
+                soup = BeautifulSoup(src, 'html.parser')
+                price_obj = soup.find_all("span", itemprop="offers")
+                #print (price_obj)
+                #if price_obj != []:
+                for item_price in price_obj:
+                    price = str(item_price)
+                    price = price[price.find("~") + 1 : price.find("$")]
+                print( price, " Цена в долларах")
+                if int(price) >= 5:
+                    print("больше 5")
+                    marka_obj = soup.find_all("span", itemprop="name")
+                    
+                    for item_marka in marka_obj:
+                        all_title_name = str(item_marka)
+                        string = all_title_name[all_title_name.find("<b>") + 1 : ]
+                        model_and_year = string[string.find(' к ')+3 :]
+                        
+                        year = model_and_year[model_and_year.find("г.")-5 : model_and_year.find("г.")].replace(",","").replace('"',"")
+                    print(year)
+                    if int(year) > 2011:
+                        num_zap = " "
+                        num_obj = soup.find_all("span", class_="media-heading cut-h-65")
+                        #print(num_obj)
+                        for item_num in num_obj:
+                            num_zap = str(item_num.text).replace("  ","").replace('"',"")
+                            num_zap = num_zap.replace(",","").replace("\n","")
+                            num_zap = num_zap.replace("далее","").replace(';',"*#")
+                        print(num_zap, "Номер запчасти")    
+                        list_num_zap = num_zap.split()
+                        print(list_num_zap, "Список номеров")
+                        
+                        artical_obj = soup.find_all("span", class_="data-type f13")
+                        for item_artical in artical_obj:
+                            artical = item_artical.text
+
+                                
+                        #print(marka, model, year, price, number_href)
+
+                                    
+                        status = "б/у"
+                        order = " "    
+                        info = " "
+                        info_obj = soup.find_all("span", class_="media-heading cut-h-375")
+                        for item_info in info_obj:
+                            info = str(item_info.text.replace("  ","").replace("\n",""))
+                            info = info.replace(","," ").replace('"',' ')
+                            info = info.replace("\r","").replace(';',"*#")
+                            info_lower = info.lower()
+                            if "под заказ" in info_lower:
+                                order = "ПОД ЗАКАЗ"
+                        preorder = soup.find_all("div", class_="preorder ")
+                        print(preorder)
+                        for item_preorder in preorder:
+                            if "под заказ" in item_preorder:
+                                order = "ПОД ЗАКАЗ"
+                        if "под заказ" in str(href_part):
+                            order = "ПОД ЗАКАЗ"   
+                        print(order, "ОРДЕР ЗДЕСЬ")
+
+                        print(info)
+                        if "новый" in info_lower:
+                            status = "новая"
+                        elif "новая" in info_lower:
+                            status = "новая"
+                        elif "новые" in info_lower:
+                            status = "новая"
+                        elif "нов." in info_lower:
+                            status = "новая"
+                        if "новая з/ч" in str(href_part):
+                            status = "новая"   
+                        print(status, "СТАТУС")
+
+
+
+
+
+                    else:
+                        print(" Запчасть очень старая, мы такими не торгуем")
+                else: 
+                    print("Цена запчасти меньше 5$")
+            except Exception:
+                print("какая-то хуйня с карточкой запчастей")
+
+        else:
+            print(href_to_zapchast + " находится в black-list, уже "+ str(zapchast_in_black_list) )
+            zapchast_in_black_list += 1
+            with requests.request("POST", href_to_zapchast, headers=headers) as report:
+                print('report: ', report)
+
+    href_part_pag = soup_1.find_all("ul", class_="pagination")
     if "След." in str(href_part_pag):
         href_part_pag = str(href_part_pag)
         #print(href_part)
         print("переходим на следующую")
         n += 1
-        osnova(item_href_page, n)
+        if n < 61:
+            osnova(item_href_page, n)
 
 for item_href_model, name_zap  in catalog.items():
     if marka_vxod_in in item_href_model:
@@ -129,24 +225,10 @@ for item_href_model, name_zap  in catalog.items():
         model = item_href_model[item_href_model.find("model")+6 : -1]
         print( marka,  model)
         i = 1
-        item_href_model = "https://bamper.by/zchbu/zapchast_zashchita-arok-podkrylok/marka_audi/model_a1/"
+        item_href_model = "https://bamper.by/zchbu/zapchast_bryzgovik/marka_audi/model_a1/"
         item_href_model = item_href_model + "?ACTION=REWRITED3&FORM_DATA=" + item_href_model[item_href_model.find("zchbu")+6 : item_href_model.find("/marka")] + "%2Fmarka_" + item_href_model[item_href_model.find("/marka")+7 : item_href_model.find("/model")] + "%2Fmodel_" + item_href_model[item_href_model.find("/model_")+7 : -1] + "&PAGEN_1=1"
         osnova(item_href_model, i)
-        """item_href_page = item_href_model + "?ACTION=REWRITED3&FORM_DATA=" + item_href_model[item_href_model.find("zchbu")+6 : item_href_model.find("/marka")] + "%2Fmarka_" + item_href_model[item_href_model.find("/marka")+7 : item_href_model.find("/model")] + "%2Fmodel_" + item_href_model[item_href_model.find("/model_")+7 : -1] + "&PAGEN_1=" + str(i)
-        print(item_href_page)
-        item_href_page = "https://bamper.by/zchbu/zapchast_zashchita-arok-podkrylok/marka_audi/model_a1/?ACTION=REWRITED3&FORM_DATA=zapchast_zashchita-arok-podkrylok%2Fmarka_audi%2Fmodel_a1&PAGEN_1=1" 
-        req = requests.get(url=item_href_page, headers=headers)
-        src = req.text
-        soup = BeautifulSoup(src, 'html.parser')
-        href_part = soup.find_all("ul", class_="pagination")        
-        #print(href_part) 
-        if "След." in str(href_part):
-            href_part = str(href_part)
-            #print(href_part)
-            print("переходим на следующую")
-            i += 1
-            item_href_page = "https://bamper.by/zchbu/zapchast_zashchita-arok-podkrylok/marka_audi/model_a1/?ACTION=REWRITED3&FORM_DATA=zapchast_zashchita-arok-podkrylok%2Fmarka_audi%2Fmodel_a1&PAGEN_1=" + str(i)
-            print(item_href_page, "вот это!")"""
+        
             
         break
 
