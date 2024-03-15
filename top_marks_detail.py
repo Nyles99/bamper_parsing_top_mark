@@ -86,6 +86,71 @@ model_need_list = {}
 marka_vxod = input("Какую марку будем парсить, выбирай из трех audi, bmw, mercedes - ")
 num_vxod = input("на какой странице ты остановился, если начало жми 0 - ")
 marka_vxod_in = "marka_" + marka_vxod
+
+folder_name =f"{marka_vxod}_" + time.strftime('%Y-%m-%d')
+if os.path.exists(folder_name):
+    print("Папка уже есть")
+else:
+    os.mkdir(folder_name)
+
+watermark = Image.open("moe.png")
+if os.path.exists(f"{marka_vxod}.csv"):
+    print("Папка уже есть")
+else:
+    with open(f"{marka_vxod}.csv", "w", encoding="utf-8") as file_data:
+        writer = csv.writer(file_data)
+
+        writer.writerow(
+            (
+                "ССЫЛКА НА ЗАПЧАСТЬ",
+                "ЦЕНА",
+                "ВНУТРЕНЯЯ ИНФОРМАЦИЯ",
+                "АРТИКУЛ",
+                "ЗАПЧАСТЬ",
+                "МАРКА",
+                "МОДЕЛЬ",
+                "ГОД",
+                "ОБЪЕМ",
+                "ТОПЛИВО",
+                "ТИП КУЗОВА",
+                "НОМЕР ЗАПЧАСТИ",
+                "НОМЕРА ЗАМЕН",
+                "ОПИСАНИЕ",
+                "ПОД ЗАКАЗ",
+                "НОВАЯ",
+                "ФОТО",
+                "СТРАНИЦА окончания",
+            )
+        )
+
+if os.path.exists(f"{marka_vxod}_added_num_zap.csv"):
+    print("Папка уже есть")
+else:
+    with open(f"{marka_vxod}_added_num_zap.csv", "w", encoding="utf-8") as file_data:
+        writer = csv.writer(file_data)
+
+        writer.writerow(
+            (
+                "ССЫЛКА НА ЗАПЧАСТЬ",
+                "ЦЕНА",
+                "ВНУТРЕНЯЯ ИНФОРМАЦИЯ",
+                "АРТИКУЛ",
+                "ЗАПЧАСТЬ",
+                "МАРКА",
+                "МОДЕЛЬ",
+                "ГОД",
+                "ОБЪЕМ",
+                "ТОПЛИВО",
+                "ТИП КУЗОВА",
+                "НОМЕР ЗАПЧАСТИ",
+                "НОМЕРА ЗАМЕН",
+                "ОПИСАНИЕ",
+                "ПОД ЗАКАЗ",
+                "НОВАЯ",
+                "ФОТО",
+                "СТРАНИЦА окончания",
+            )
+        )
 with open('zapchast_and_href.json', encoding="utf-8") as file:
     catalog = json.load(file)
 
