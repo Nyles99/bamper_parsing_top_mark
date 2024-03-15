@@ -114,7 +114,6 @@ else:
                 "ТОПЛИВО",
                 "ТИП КУЗОВА",
                 "НОМЕР ЗАПЧАСТИ",
-                "НОМЕРА ЗАМЕН",
                 "ОПИСАНИЕ",
                 "ПОД ЗАКАЗ",
                 "НОВАЯ",
@@ -154,7 +153,7 @@ else:
 with open('zapchast_and_href.json', encoding="utf-8") as file:
     catalog = json.load(file)
 
-def osnova(href, n):
+def osnova(href, n, marka, model, name_zap, number_page):
     item_href_page = href[:-1]  + str(n)
     print(item_href_page)
     
@@ -178,7 +177,7 @@ def osnova(href, n):
         name_href = name_href.replace("*","_").replace('%','_')
         #print(name_href)
         num_provider = name_href[: name_href.find("-")]
-        #print(num_provider)
+        print(num_provider)
         if num_provider not in black_list:
             try:
                 req = requests.get(url=href_to_zapchast, headers=headers)
@@ -211,7 +210,8 @@ def osnova(href, n):
                             num_zap = str(item_num.text).replace("  ","").replace('"',"")
                             num_zap = num_zap.replace(",","").replace("\n","")
                             num_zap = num_zap.replace("далее","").replace(';',"*#")
-                        print(num_zap, "Номер запчасти")    
+                        print(num_zap, "Номер запчасти")
+                        all_num_zap = num_zap    
                         list_num_zap = num_zap.split()
                         print(list_num_zap, "Список номеров")
                         
@@ -256,10 +256,190 @@ def osnova(href, n):
                             status = "новая"   
                         print(status, "СТАТУС")
 
+                        if foto != "https://bamper.by/local/templates/bsclassified/images/nophoto_car.png":
+                            try:
+                                img = requests.get(foto)
+                                img_option = open(f"{folder_name}/{name_href}.png", 'wb')
+                                img_option.write(img.content)
+                                img_option.close
+                                try:
+                                    im = Image.open(f"{folder_name}/{name_href}.png")
+                                    pixels = im.load()  # список с пикселями
+                                    x, y = im.size  # ширина (x) и высота (y) изображения
+                                    min_line_white = []
+                                    n=0
+                                    for j in range(y):
+                                        white_pix = 0
+                        
+                                        for m in range(x):
+                                            # проверка чисто белых пикселей, для оттенков нужно использовать диапазоны
+                                            if pixels[m, j] == (248,248,248):         # pixels[i, j][q] > 240  # для оттенков
+                                                white_pix += 1
+                                        if white_pix == x:
+                                            n += 1
+                                        #print(white_pix, x, n)
+
+                                        #print(white_pix)
+                                        min_line_white.append(white_pix)
+                                    left_border = int(min(min_line_white)/2)
+                                    #print(left_border)
+                                    im.crop(((left_border+15), n/2+20, (x-left_border-20), y-(n/2)-20)).save(f"{folder_name}/{name_href}.png", quality=95)
 
 
 
 
+                                    foto = "http://194.58.122.233/"+ name_href + ".png"
+                                    img = Image.open(f"{folder_name}/{name_href}.png")
+                                    #print(foto)
+                                    #img = Image.open(f"fotku/{name_href}.png")    
+                                    img.paste(watermark,(-272,-97), watermark)
+                                    img.paste(watermark,(-230,1), watermark)
+                                    img.save(f"{folder_name}/{name_href}.png", format="png")
+                                    img_option.close
+                                    #os.remove("img.png")
+                                    #print(f"{name_href} - неверный формат или ерунда")
+                                except UnidentifiedImageError:
+                                        foto = "Битая фотка"
+                                        print("Битая фотка")
+                                        #os.remove(f"{folder_name}/{name_href}.png")
+                            except Exception:
+                                print("Какая-то хуйня с ссылкой на фотографию")
+                                foto = " "
+                        else:
+                            foto = "Нет фотографии"
+                            print(name_href , "без фотки")
+                                
+                        benzik_obj = soup.find_all("div", style="font-size: 17px;")
+                        fuel = " "
+                        transmission = " "
+                        engine = " "
+                        volume = " "
+                        car_body = " "
+                        # print(benzik_obj)
+                        for item_benzik in benzik_obj:
+                            benzik = " "
+                            benzik = item_benzik.text.replace("  ","").replace("\n","")
+                            if "л," in benzik:
+                                volume = benzik[benzik.find("л,") - 5 : benzik.find("л,") + 1]
+                            if "бензин" in benzik:
+                                fuel = "бензин"
+                            elif "дизель" in benzik:
+                                fuel = "дизель"
+                            elif "электро" in benzik:
+                                fuel = "электро"
+                            elif "гибрид" in benzik:
+                                fuel = "гибрид"
+                            if "седан" in benzik:
+                                car_body = "седан"
+                            elif "хетчбек" in benzik:
+                                car_body = "хетчбек"
+                            elif "внедорожник" in benzik:
+                                car_body = "внедорожник"
+                            elif "универсал" in benzik:
+                                car_body = "универсал"
+                            elif "кабриолет" in benzik:
+                                car_body = "кабриолет"
+                            elif "микроавтобус" in benzik:
+                                car_body = "микроавтобус"
+                            elif "пикап" in benzik:
+                                car_body = "пикап" 
+                        #print(volume, fuel, transmission, engine, car_body)
+                        #print(benzik)
+                        #another_zap = ""
+                        count = 0
+                        #if list_num_zap != []:
+                        for zap in list_num_zap:
+                            count +=1
+                        print("До сюда дошло!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                        
+                        if count > 1:
+                            
+                            for zap in list_num_zap:
+                                another_zap = another_zap + " " + zap 
+                            for zap in list_num_zap: 
+                                file = open(f"{marka}_added_num_zap.csv", "a", encoding="utf-8", newline='')
+                                writer = csv.writer(file)
+
+                                writer.writerow(
+                                    (
+                                        href_to_zapchast,
+                                        price,
+                                        "0"+"_PB"+num_provider,
+                                        artical,
+                                        name_zap,
+                                        marka,
+                                        model,
+                                        year,
+                                        volume,
+                                        fuel,
+                                        car_body,
+                                        zap,
+                                        another_zap,
+                                        info,
+                                        order,
+                                        status,
+                                        foto,
+                                        number_page                                   
+                                    )
+                                )
+                                file.close()
+                        else:
+                            another_zap = " "
+                            file = open(f"{marka}_added_num_zap.csv", "a", encoding="utf-8", newline='')
+                            writer = csv.writer(file)
+
+                            writer.writerow(
+                                (
+                                    href_to_zapchast,
+                                    price,
+                                    "0"+"_PB"+num_provider,
+                                    artical,
+                                    name_zap,
+                                    marka,
+                                    model,
+                                    year,
+                                    volume,
+                                    fuel,
+                                    car_body,
+                                    num_zap,
+                                    another_zap,
+                                    info,
+                                    order,
+                                    status,
+                                    foto,
+                                    number_page                                  
+                                )
+                            )
+                            file.close()
+                        file = open(f"{marka}.csv", "a", encoding="utf-8", newline='')
+                        writer = csv.writer(file)
+
+                        writer.writerow(
+                            (
+                                href_to_zapchast,
+                                price,
+                                "0"+"_PB"+num_provider,
+                                artical,
+                                name_zap,
+                                marka,
+                                model,
+                                year,
+                                volume,
+                                fuel,
+                                car_body,
+                                all_num_zap,
+                                info,
+                                order,
+                                status,
+                                foto,
+                                number_page                                   
+                            )
+                        )
+                        file.close()
+                        #os.remove(f"{name_href}.html")
+                        with requests.request("POST", href_to_zapchast, headers=headers) as report:
+                            print('report: ', report)
+                   
                     else:
                         print(" Запчасть очень старая, мы такими не торгуем")
                 else: 
@@ -268,8 +448,7 @@ def osnova(href, n):
                 print("какая-то хуйня с карточкой запчастей")
 
         else:
-            print(href_to_zapchast + " находится в black-list, уже "+ str(zapchast_in_black_list) )
-            zapchast_in_black_list += 1
+            print(href_to_zapchast + " находится в black-list, уже ")
             with requests.request("POST", href_to_zapchast, headers=headers) as report:
                 print('report: ', report)
 
@@ -280,21 +459,27 @@ def osnova(href, n):
         print("переходим на следующую")
         n += 1
         if n < 61:
-            osnova(item_href_page, n)
+            osnova(item_href_page, n, marka, model, name_zap, number_page)
 
+number_page = 0
 for item_href_model, name_zap  in catalog.items():
     if marka_vxod_in in item_href_model:
-        print(item_href_model)
-        print(name_zap)
-        marka = marka_vxod
-        model = item_href_model[item_href_model.find("model")+6 : -1]
-        print( marka,  model)
-        i = 1
-        item_href_model = "https://bamper.by/zchbu/zapchast_bryzgovik/marka_audi/model_a1/"
-        item_href_model = item_href_model + "?ACTION=REWRITED3&FORM_DATA=" + item_href_model[item_href_model.find("zchbu")+6 : item_href_model.find("/marka")] + "%2Fmarka_" + item_href_model[item_href_model.find("/marka")+7 : item_href_model.find("/model")] + "%2Fmodel_" + item_href_model[item_href_model.find("/model_")+7 : -1] + "&PAGEN_1=1"
-        osnova(item_href_model, i)
-        
+        if int(number_page) >= int(num_vxod):
+            number_page += 1
+            print(item_href_model)
+            print(name_zap)
+            marka = marka_vxod
+            model = item_href_model[item_href_model.find("model")+6 : -1]
+            print( marka,  model)
             
-        break
+            i = 1
+            print()
+            #item_href_model = "https://bamper.by/zchbu/zapchast_bryzgovik/marka_audi/model_a1/"
+            item_href_model = item_href_model + "?ACTION=REWRITED3&FORM_DATA=" + item_href_model[item_href_model.find("zchbu")+6 : item_href_model.find("/marka")] + "%2Fmarka_" + item_href_model[item_href_model.find("/marka")+7 : item_href_model.find("/model")] + "%2Fmodel_" + item_href_model[item_href_model.find("/model_")+7 : -1] + "&PAGEN_1=1"
+            osnova(item_href_model, i, marka, model, name_zap, number_page)
+        else:
+            number_page += 1
+            
+        
 
 a = input("Нажмите 1 и ENTER, чтобы закончить это сумасшествие - ")
