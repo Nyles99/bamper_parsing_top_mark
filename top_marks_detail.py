@@ -22,31 +22,6 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
 }
 
-options = webdriver.ChromeOptions()
-options.add_argument("--disable-blink-features=AutomationControlled")
-options.add_experimental_option('excludeSwitches', ['enable-logging'])
-#options.add_experimental_option('useAutomationExtension', False)
-options.add_argument('--ignore-certificate-errors')
-options.add_argument("start-maximized") # // https://stackoverflow.com/a/26283818/1689770
-options.add_argument("enable-automation")#  // https://stackoverflow.com/a/43840128/1689770
-#options.add_argument("--headless")#  // only if you are ACTUALLY running headless
-options.add_argument("--no-sandbox")# //https://stackoverflow.com/a/50725918/1689770
-options.add_argument("--disable-dev-shm-usage")# //https://stackoverflow.com/a/50725918/1689770
-options.add_argument("--disable-browser-side-navigation")# //https://stackoverflow.com/a/49123152/1689770
-options.add_argument("--disable-gpu")
-options.add_argument("--disable-infobars")# //https://stackoverflow.com/a/43840128/1689770
-options.add_argument("--enable-javascript")
-
-#options.add_argument("--proxy-server=31.204.2.182:9142")
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
-driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-    'source': '''
-        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Array:
-        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Promise:
-        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol:
-    '''
-})
 
 summa = 0
 black_list = []
@@ -83,7 +58,7 @@ file1.close
 marka_need_list = {}
 model_need_list = {}       
 
-marka_vxod = input("Какую марку будем парсить, выбирай из трех audi, bmw, mercedes - ")
+marka_vxod = input("Какую марку будем парсить, выбирай из трех audi, bmw, mercedes или volkswagen - ")
 num_vxod = input("на какой странице ты остановился, если начало жми 0 - ")
 marka_vxod_in = "marka_" + marka_vxod
 

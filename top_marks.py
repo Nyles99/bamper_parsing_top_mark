@@ -126,4 +126,4 @@ for item_text, item_href_model in catalog.items():
 with open("zapchast_and_href.json", "a", encoding="utf-8") as file:
     json.dump(zapchast_and_href, file, indent=4, ensure_ascii=False)
 
-a = input("Нажмите 1 и ENTER, чтобы закончить это сумасшествие")
+a = input("Нажмите 1 и ENTER, чтобы закончить это сумасшествие  - ")
