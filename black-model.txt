@@ -90,3 +90,53 @@ Mercedes-Econic
 Mercedes-G
 Mercedes-G W460
 Mercedes-G W463
+Kia-Avella
+Kia-Besta
+Kia-Borrego
+Kia-Cadenza
+Kia-Carens
+Kia-Carnival
+Kia-Clarus
+Kia-EV6
+Kia-Forte
+Kia-Joice
+Kia-K2500
+Kia-K2700
+Kia-K900
+Kia-Magentis
+Kia-Mentor
+Kia-Opirus
+Kia-Potentia
+Kia-Pregio
+Kia-Ray
+Kia-Retona
+Kia-Sephia
+Kia-Shuma
+Kia-Spectra
+Kia-Telluride
+Hyundai-Amico
+Hyundai-Atos
+Hyundai-Coupe
+Hyundai-Dynasty
+Hyundai-Excel
+Hyundai-Galloper
+Hyundai-Getz
+Hyundai-H100
+Hyundai-H200
+Hyundai-HD
+Hyundai-HD120
+Hyundai-Lantra
+Hyundai-Libero
+Hyundai-Matrix
+Hyundai-Pony
+Hyundai-Porter
+Hyundai-S Coupe
+Hyundai-Santa Cruz
+Hyundai-Santamo
+Hyundai-Starex
+Hyundai-Terracan
+Hyundai-Tiburon
+Hyundai-Trajet
+Hyundai-Veracruz
+Hyundai-Verna
+Hyundai-XG
