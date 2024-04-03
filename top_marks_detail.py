@@ -69,14 +69,24 @@ else:
     os.mkdir(folder_name)
 
 watermark = Image.open("moe.png")
-if os.path.exists(f"{marka_vxod}.csv"):
+if os.path.exists(f"{marka_vxod}_zzap.csv"):
     print("Папка уже есть")
 else:
-    with open(f"{marka_vxod}.csv", "w", encoding="utf-8") as file_data:
+    with open(f"{marka_vxod}_zzap.csv", "w", encoding="utf-8") as file_data:
         writer = csv.writer(file_data)
 
         writer.writerow(
             (
+                "ПРОИЗВОДИТЕЛЬ",
+                "НОМЕР ДЕТАЛИ",
+                "НАИМЕНОВАНИЕ ДЕТАЛИ",
+                "ОПИСАНИЕ ZZAP",
+                "ЦЕНА",
+                "СОСТОЯНИЕ",
+                "СРОК ДОСТАВКИ",
+                "ФОТО",
+                "ССЫЛКА НА ЗАПЧАСТЬ",
+                """
                 "ССЫЛКА НА ЗАПЧАСТЬ",
                 "ЦЕНА",
                 "ВНУТРЕНЯЯ ИНФОРМАЦИЯ",
@@ -93,36 +103,39 @@ else:
                 "ПОД ЗАКАЗ",
                 "НОВАЯ",
                 "ФОТО",
-                "СТРАНИЦА окончания",
+                "СТРАНИЦА окончания","""
             )
         )
 
-if os.path.exists(f"{marka_vxod}_added_num_zap.csv"):
+if os.path.exists(f"{marka_vxod}_drom.csv"):
     print("Папка уже есть")
 else:
-    with open(f"{marka_vxod}_added_num_zap.csv", "w", encoding="utf-8") as file_data:
+    with open(f"{marka_vxod}_drom.csv", "w", encoding="utf-8") as file_data:
         writer = csv.writer(file_data)
 
         writer.writerow(
             (
-                "ССЫЛКА НА ЗАПЧАСТЬ",
-                "ЦЕНА",
-                "ВНУТРЕНЯЯ ИНФОРМАЦИЯ",
                 "АРТИКУЛ",
-                "ЗАПЧАСТЬ",
+                "НАИМЕНОВАНИЕ ДЕТАЛИ",
+                "СОСТОЯНИЕ",
                 "МАРКА",
                 "МОДЕЛЬ",
-                "ГОД",
-                "ОБЪЕМ",
-                "ТОПЛИВО",
-                "ТИП КУЗОВА",
+                "ВЕРСИЯ",
                 "НОМЕР ЗАПЧАСТИ",
-                "НОМЕРА ЗАМЕН",
-                "ОПИСАНИЕ",
-                "ПОД ЗАКАЗ",
-                "НОВАЯ",
+                "ОБЪЕМ ДВИГАТЕЛЯ",
+                "ГОД",
+                "L_R",
+                "F_R",
+                "U_D",
+                "ЦВЕТ",
+                "ОПИСАНИЕ DROM",
+                "КОЛИЧЕСТВО",
+                "ЦЕНА",
+                "НАЛИЧИЕ",
+                "СРОК ДОСТАВКИ",
                 "ФОТО",
-                "СТРАНИЦА окончания",
+                "ССЫЛКА НА ЗАПЧАСТЬ",
+                "ВНУТРЕНЯЯ ИНФОРМАЦИЯ",
             )
         )
 with open('zapchast_and_href.json', encoding="utf-8") as file:

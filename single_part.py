@@ -67,31 +67,55 @@ else:
     os.mkdir(folder_name)
 
 watermark = Image.open("moe.png")
-if os.path.exists(f"{input_name}.csv"):
-    print("Папка уже есть")
+if os.path.exists(f"{input_name}_zzap.csv"):
+    print("файл csv уже есть")
 else:
-    with open(f"{input_name}.csv", "w", encoding="utf-8") as file_data:
+    with open(f"{input_name}_zzap.csv", "w", encoding="utf-8") as file_data:
         writer = csv.writer(file_data)
 
         writer.writerow(
             (
-                "ССЫЛКА НА ЗАПЧАСТЬ",
+                "ПРОИЗВОДИТЕЛЬ",
+                "НОМЕР ДЕТАЛИ",
+                "НАИМЕНОВАНИЕ ДЕТАЛИ",
+                "ОПИСАНИЕ ZZAP",
                 "ЦЕНА",
-                "ВНУТРЕНЯЯ ИНФОРМАЦИЯ",
+                "СОСТОЯНИЕ",
+                "СРОК ДОСТАВКИ",
+                "ФОТО",
+                "ССЫЛКА НА ЗАПЧАСТЬ",
+            )
+        )
+
+if os.path.exists(f"{input_name}_drom.csv"):
+    print("файл csv уже есть")
+else:
+    with open(f"{input_name}_drom.csv", "w", encoding="utf-8") as file_data:
+        writer = csv.writer(file_data)
+
+        writer.writerow(
+            (
                 "АРТИКУЛ",
-                "ЗАПЧАСТЬ",
+                "НАИМЕНОВАНИЕ ДЕТАЛИ",
+                "СОСТОЯНИЕ",
                 "МАРКА",
                 "МОДЕЛЬ",
+                "ВЕРСИЯ",
+                "НОМЕР ДЕТАЛИ",
+                "ОБЪЕМ ДВИГАТЕЛЯ",
                 "ГОД",
-                "ОБЪЕМ",
-                "ТОПЛИВО",
-                "ТИП КУЗОВА",
-                "НОМЕР ЗАПЧАСТИ",
-                "ОПИСАНИЕ",
-                "ПОД ЗАКАЗ",
-                "НОВАЯ",
+                "L_R",
+                "F_R",
+                "U_D",
+                "ЦВЕТ",
+                "ОПИСАНИЕ DROM",
+                "КОЛИЧЕСТВО",
+                "ЦЕНА",
+                "НАЛИЧИЕ",
+                "СРОК ДОСТАВКИ",
                 "ФОТО",
-                "СТРАНИЦА окончания",
+                "ССЫЛКА НА ЗАПЧАСТЬ",
+                "ВНУТРЕНЯЯ ИНФОРМАЦИЯ",
             )
         )
 
@@ -151,7 +175,7 @@ def osnova(href, i, number_page):
                             marka = "New Holland"
                         marka_len = len(marka)+1
                         model_string = model_and_year[marka_len : ]
-                        model = model_string[: model_string.find(" ")]                       
+                        model = model_string[: model_string.find(" ")-1]                       
                         year = model_and_year[model_and_year.find("г.")-5 : model_and_year.find("г.")].replace(",","").replace('"',"")
                     print(year)
                     
@@ -162,7 +186,10 @@ def osnova(href, i, number_page):
                         num_zap = str(item_num.text).replace("  ","").replace('"',"")
                         num_zap = num_zap.replace(",","").replace("\n","")
                         num_zap = num_zap.replace("далее","").replace(';',"*#")
+                        
                     print(num_zap, "Номер запчасти")
+                    one_num_zap = num_zap[ : num_zap.find(' ')]
+                    num_zap = num_zap.rstrip().replace(" ",";")
                     """all_num_zap = num_zap    
                     list_num_zap = num_zap.split()
                     print(list_num_zap, "Список номеров")"""
@@ -299,28 +326,51 @@ def osnova(href, i, number_page):
                     #print(benzik)
                     #another_zap = ""
                     
-                    file = open(f"{input_name}.csv", "a", encoding="utf-8", newline='')
+                    file = open(f"{input_name}_zzap.csv", "a", encoding="utf-8", newline='')
                     writer = csv.writer(file)
 
                     writer.writerow(
                         (
-                            href_to_zapchast,
+                            "",
+                            one_num_zap,
+                            name_zap,
+                            "",
                             price,
-                            "0"+"_PB"+num_provider,
+                            status,
+                            "",
+                            foto,
+                            href_to_zapchast,
+                            info,                                  
+                        )
+                    )
+                    file.close()
+
+                    file = open(f"{input_name}_drom.csv", "a", encoding="utf-8", newline='')
+                    writer = csv.writer(file)
+
+                    writer.writerow(
+                        (
                             artical,
                             name_zap,
+                            status,
                             marka,
                             model,
-                            year,
-                            volume,
-                            fuel,
-                            car_body,
+                            "ВЕРСИЯ",
                             num_zap,
-                            info,
-                            order,
-                            status,
+                            volume,
+                            year,
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "1",
+                            price,
+                            "ПОД ЗАКАЗ",
+                            "",
                             foto,
-                            number_page                                   
+                            href_to_zapchast,
+                            info,                                   
                         )
                     )
                     file.close()
@@ -342,13 +392,18 @@ def osnova(href, i, number_page):
     href_part_pag = soup_1.find_all("ul", class_="pagination")
     if "След." in str(href_part_pag):
         href_part_pag = str(href_part_pag)
+        print(href_part_pag)
         i += 1
-        href_sled = "https://bamper.by" + href_part_pag[href_part_pag.find("modern-page-next") + 24 : href_part_pag.find(">След.") -1] +f"&PAGEN_1={i}"
+        href_sled = "https://bamper.by" + href_part_pag[href_part_pag.find("modern-page-next") + 24 : href_part_pag.find(">След.") -1]
+        if 2<= i < 11: 
+            href_sled = href_sled[ : -10] + f"&PAGEN_1={i}"
+        elif i > 10:
+            href_sled = href_sled[ : -11] + f"&PAGEN_1={i}"
+            
         print(href_sled)
         print("переходим на следующую")
-        n += 1
-        if n < 61:
-            osnova(href_sled, i, number_page)
+        
+        osnova(href_sled, i, number_page)
 
 
 osnova(input_url, i=1, number_page=1)
