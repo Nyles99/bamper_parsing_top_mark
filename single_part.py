@@ -188,7 +188,7 @@ def osnova(href, i, number_page):
                         num_zap = num_zap.replace("далее","").replace(';',"*#")
                         
                     print(num_zap, "Номер запчасти")
-                    one_num_zap = num_zap[ : num_zap.find(' ')]
+                    one_num_zap = num_zap[ : num_zap.find(' ')].upper()
                     num_zap = num_zap.rstrip().replace(" ",";")
                     """all_num_zap = num_zap    
                     list_num_zap = num_zap.split()
@@ -331,13 +331,13 @@ def osnova(href, i, number_page):
 
                     writer.writerow(
                         (
-                            "",
+                            "3",
                             one_num_zap,
                             name_zap,
-                            "",
+                            f"{marka} {model} {version} {year} г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать {artical}. Номер детали: {one_num_zap},",
                             price,
                             status,
-                            "",
+                            "2-4 дня",
                             foto,
                             href_to_zapchast,
                             info,                                  
