@@ -83,7 +83,6 @@ else:
                 "СОСТОЯНИЕ",
                 "СРОК ДОСТАВКИ",
                 "ФОТО",
-                "ССЫЛКА НА ЗАПЧАСТЬ",
             )
         )
 
@@ -114,8 +113,6 @@ else:
                 "НАЛИЧИЕ",
                 "СРОК ДОСТАВКИ",
                 "ФОТО",
-                "ССЫЛКА НА ЗАПЧАСТЬ",
-                "ВНУТРЕНЯЯ ИНФОРМАЦИЯ",
             )
         )
 
@@ -130,7 +127,7 @@ def osnova(href, i, number_page):
     for item in href_part:
         item = str(item)
         foto = " "
-        version = " "
+        version = ""
         foto = "https://bamper.by" + item[item.find('"tooltip_" src=') + 16 : item.find('title="Нажми,') -2]
         item = item[item.find("href")+7: item.find("target=") -2]
         #print(foto)
@@ -174,10 +171,12 @@ def osnova(href, i, number_page):
                             marka = "Aston Martin"
                         if "New" in marka:
                             marka = "New Holland"
+                        if "John" in marka:
+                            marka = "John Deer"
                         marka_len = len(marka)+1
                         model_string = model_and_year[marka_len : ]
-                        model = model_string[: model_string.find(" ")-1]
-                        version = model_string[model_string.find(" ")+1 : model_string.find(",")]                       
+                        model = model_string[: model_string.find(",")].replace(",","").replace("   "," ").replace("  "," ").rstrip()
+                        #version = model_string[model_string.find(" ")+1 : model_string.find(",")]                       
                         year = model_and_year[model_and_year.find("г.")-5 : model_and_year.find("г.")].replace(",","").replace('"',"")
                     print(year)
                     
@@ -191,7 +190,7 @@ def osnova(href, i, number_page):
                         
                     print(num_zap, "Номер запчасти")
                     one_num_zap = num_zap[ : num_zap.find(' ')].upper()
-                    num_zap = num_zap.rstrip().replace(" ",";")
+                    num_zap = num_zap.rstrip().replace(" ","; ")
                     """all_num_zap = num_zap    
                     list_num_zap = num_zap.split()
                     print(list_num_zap, "Список номеров")"""
@@ -327,23 +326,31 @@ def osnova(href, i, number_page):
                     #print(volume, fuel, transmission, engine, car_body)
                     #print(benzik)
                     #another_zap = ""
-                    text_zzap = f"{marka} {model} {version} {year} г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать z-{artical}. Номер детали: {one_num_zap}, {num_zap}. Склад: {num_provider}_3_{price}. {status}."
-                    text_drom = f"{name_zap} {marka} {model} {version} {year} г.в., {fuel}, {volume}, {car_body}. Будьте готовы назвать {artical}. Номер детали: {one_num_zap}, {num_zap}. Склад: 3_{price}_{num_provider}. {status}. Задавайте пожалуйста вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. Деталь в наличии на складе поставщика. Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня (до вашего города уточняйте), бывают исключения, где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). Если деталь не понадобилась - возврат не рассматривается! Оценивайте качество товара и применимость самостоятельно. По VIN автомобиля запчасти не подбираем, строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!"
+                    status_new = ""
+                    if status == "новая":
+                        status_new = "Новая деталь"
+                    else:
+                        status_new = "Контрактная деталь, без пробега по России"
+                    if num_zap == " " or num_zap == "" or num_zap == "  ":
+                        num_zap_text = ""
+                    else:
+                        num_zap_text = f" Номер детали: {one_num_zap}, {num_zap}."
+                    text_zzap = f"{marka} {model} {version} {year} г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap_text} Склад: 3_{price}_PB_{num_provider}. {status_new}.".replace(" ,","").replace("..",".").replace(" .",".").replace("  .",".").replace("., .",".").replace(".,  .",".").replace("  "," ")
+                    text_drom = f"{name_zap} {marka} {model} {version} {year} г.в., {fuel}, {volume}, {car_body}. Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap_text} Склад: 3_{price}_PB_{num_provider}. {status_new}. Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения, где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!".replace(" ,","").replace("..",".").replace(" .",".").replace("  .",".").replace("., .",".").replace(".,  .",".").replace("  "," ")
+                    
                     file = open(f"{input_name}_zzap.csv", "a", encoding="utf-8", newline='')
                     writer = csv.writer(file)
 
                     writer.writerow(
                         (
-                            "3",
+                            marka,
                             one_num_zap,
                             name_zap,
                             text_zzap,
                             price,
                             status,
                             "2-4 дня",
-                            foto,
-                            href_to_zapchast,
-                            info,                                  
+                            foto,                                  
                         )
                     )
                     file.close()
@@ -353,7 +360,7 @@ def osnova(href, i, number_page):
 
                     writer.writerow(
                         (
-                            f"d-{artical}",
+                            f"АРТИКУЛ: D-{artical}",
                             name_zap,
                             status,
                             marka,
@@ -371,9 +378,7 @@ def osnova(href, i, number_page):
                             price,
                             "под заказ",
                             "2-4 дня",
-                            foto,
-                            href_to_zapchast,
-                            info,                                   
+                            foto,                                   
                         )
                     )
                     file.close()
