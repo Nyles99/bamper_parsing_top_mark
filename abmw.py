@@ -58,7 +58,7 @@ file1.close
 marka_need_list = {}
 model_need_list = {}       
 
-marka_vxod = input("Какую марку будем парсить, выбирай из трех audi, bmw, mercedes или volkswagen - ")
+marka_vxod = input("Какую марку будем парсить, выбирай из четырёх audi, bmw, mercedes или volkswagen - ")
 num_vxod = input("на какой странице ты остановился, если начало жми 0 - ")
 marka_vxod_in = "marka_" + marka_vxod
 
@@ -70,7 +70,7 @@ else:
 
 watermark = Image.open("moe.png")
 if os.path.exists(f"{marka_vxod}_zzap.csv"):
-    print("Папка уже есть")
+    print("файл csv уже есть")
 else:
     with open(f"{marka_vxod}_zzap.csv", "w", encoding="utf-8") as file_data:
         writer = csv.writer(file_data)
@@ -85,30 +85,11 @@ else:
                 "СОСТОЯНИЕ",
                 "СРОК ДОСТАВКИ",
                 "ФОТО",
-                "ССЫЛКА НА ЗАПЧАСТЬ",
-                """
-                "ССЫЛКА НА ЗАПЧАСТЬ",
-                "ЦЕНА",
-                "ВНУТРЕНЯЯ ИНФОРМАЦИЯ",
-                "АРТИКУЛ",
-                "ЗАПЧАСТЬ",
-                "МАРКА",
-                "МОДЕЛЬ",
-                "ГОД",
-                "ОБЪЕМ",
-                "ТОПЛИВО",
-                "ТИП КУЗОВА",
-                "НОМЕР ЗАПЧАСТИ",
-                "ОПИСАНИЕ",
-                "ПОД ЗАКАЗ",
-                "НОВАЯ",
-                "ФОТО",
-                "СТРАНИЦА окончания","""
             )
         )
 
 if os.path.exists(f"{marka_vxod}_drom.csv"):
-    print("Папка уже есть")
+    print("файл csv уже есть")
 else:
     with open(f"{marka_vxod}_drom.csv", "w", encoding="utf-8") as file_data:
         writer = csv.writer(file_data)
@@ -121,7 +102,7 @@ else:
                 "МАРКА",
                 "МОДЕЛЬ",
                 "ВЕРСИЯ",
-                "НОМЕР ЗАПЧАСТИ",
+                "НОМЕР ДЕТАЛИ",
                 "ОБЪЕМ ДВИГАТЕЛЯ",
                 "ГОД",
                 "L_R",
@@ -134,12 +115,13 @@ else:
                 "НАЛИЧИЕ",
                 "СРОК ДОСТАВКИ",
                 "ФОТО",
-                "ССЫЛКА НА ЗАПЧАСТЬ",
-                "ВНУТРЕНЯЯ ИНФОРМАЦИЯ",
             )
         )
 with open('zapchast_and_href.json', encoding="utf-8") as file:
     catalog = json.load(file)
+
+with open('prouzbod.json', encoding="utf-8") as file:
+    prouz = json.load(file)
 
 def osnova(href, n, marka, model, name_zap, number_page):
     item_href_page = href[:-1]  + str(n)
@@ -179,6 +161,7 @@ def osnova(href, n, marka, model, name_zap, number_page):
                     price = str(item_price)
                     price = price[price.find("~") + 1 : price.find("$")]
                 print( price, " Цена в долларах")
+                version = "    "
                 if int(price) >= 5:
                     print("больше 5")
                     marka_obj = soup.find_all("span", itemprop="name")
@@ -198,10 +181,13 @@ def osnova(href, n, marka, model, name_zap, number_page):
                             num_zap = str(item_num.text).replace("  ","").replace('"',"")
                             num_zap = num_zap.replace(",","").replace("\n","")
                             num_zap = num_zap.replace("далее","").replace(';',"*#")
-                        print(num_zap, "Номер запчасти")
+                        """print(num_zap, "Номер запчасти")
                         all_num_zap = num_zap    
                         list_num_zap = num_zap.split()
-                        print(list_num_zap, "Список номеров")
+                        print(list_num_zap, "Список номеров")"""
+                        print(num_zap, "Номер запчасти")
+                        one_num_zap = num_zap[ : num_zap.find(' ')].upper()
+                        num_zap = num_zap.rstrip().replace(" ","; ")
                         
                         artical_obj = soup.find_all("span", class_="data-type f13")
                         for item_artical in artical_obj:
@@ -212,8 +198,8 @@ def osnova(href, n, marka, model, name_zap, number_page):
 
                                     
                         status = "б/у"
-                        order = " "    
-                        info = " "
+                        order = "    "    
+                        info = "    "
                         info_obj = soup.find_all("span", class_="media-heading cut-h-375")
                         for item_info in info_obj:
                             info = str(item_info.text.replace("  ","").replace("\n",""))
@@ -276,7 +262,7 @@ def osnova(href, n, marka, model, name_zap, number_page):
 
 
 
-                                    foto = "http://194.58.122.233/"+ name_href + ".png"
+                                    foto = "http://171.25.166.53/~Reppart/reppart/"+ name_href + ".png"
                                     img = Image.open(f"{folder_name}/{name_href}.png")
                                     #print(foto)
                                     #img = Image.open(f"fotku/{name_href}.png")    
@@ -292,20 +278,20 @@ def osnova(href, n, marka, model, name_zap, number_page):
                                         #os.remove(f"{folder_name}/{name_href}.png")
                             except Exception:
                                 print("Какая-то хуйня с ссылкой на фотографию")
-                                foto = " "
+                                foto = "    "
                         else:
                             foto = "Нет фотографии"
                             print(name_href , "без фотки")
                                 
                         benzik_obj = soup.find_all("div", style="font-size: 17px;")
-                        fuel = " "
-                        transmission = " "
-                        engine = " "
-                        volume = " "
-                        car_body = " "
+                        fuel = "    "
+                        transmission = "    "
+                        engine = "    "
+                        volume = "    "
+                        car_body = "    "
                         # print(benzik_obj)
                         for item_benzik in benzik_obj:
-                            benzik = " "
+                            benzik = "    "
                             benzik = item_benzik.text.replace("  ","").replace("\n","")
                             if "л," in benzik:
                                 volume = benzik[benzik.find("л,") - 5 : benzik.find("л,") + 1]
@@ -334,93 +320,69 @@ def osnova(href, n, marka, model, name_zap, number_page):
                         #print(volume, fuel, transmission, engine, car_body)
                         #print(benzik)
                         #another_zap = ""
-                        count = 0
-                        #if list_num_zap != []:
-                        for zap in list_num_zap:
-                            count +=1
-                        print("До сюда дошло!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                        
-                        if count > 1:
-                            
-                            for zap in list_num_zap:
-                                another_zap = another_zap + " " + zap 
-                            for zap in list_num_zap: 
-                                file = open(f"{marka}_added_num_zap.csv", "a", encoding="utf-8", newline='')
-                                writer = csv.writer(file)
-
-                                writer.writerow(
-                                    (
-                                        href_to_zapchast,
-                                        price,
-                                        "0"+"_PB"+num_provider,
-                                        artical,
-                                        name_zap,
-                                        marka,
-                                        model,
-                                        year,
-                                        volume,
-                                        fuel,
-                                        car_body,
-                                        zap,
-                                        another_zap,
-                                        info,
-                                        order,
-                                        status,
-                                        foto,
-                                        number_page                                   
-                                    )
-                                )
-                                file.close()
+                        status_new = ""
+                        if status == "новая":
+                            status_new = "Новая деталь"
                         else:
-                            another_zap = " "
-                            file = open(f"{marka}_added_num_zap.csv", "a", encoding="utf-8", newline='')
-                            writer = csv.writer(file)
+                            status_new = "Контрактная деталь, без пробега по России"
+                        if num_zap == " " or num_zap == "" or num_zap == "  ":
+                            num_zap_text = ""
+                        else:
+                            num_zap_text = f" Номер детали: {one_num_zap}, {num_zap}."
+                        print("Дошло до этого места")
+                        proizvoditel = marka
+                        for m_in, m_out in prouz.items():
+                            print(m_in)
+                            if m_in in marka:
+                                proizvoditel = m_out
+                                print(proizvoditel,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
-                            writer.writerow(
-                                (
-                                    href_to_zapchast,
-                                    price,
-                                    "0"+"_PB"+num_provider,
-                                    artical,
-                                    name_zap,
-                                    marka,
-                                    model,
-                                    year,
-                                    volume,
-                                    fuel,
-                                    car_body,
-                                    num_zap,
-                                    another_zap,
-                                    info,
-                                    order,
-                                    status,
-                                    foto,
-                                    number_page                                  
-                                )
-                            )
-                            file.close()
-                        file = open(f"{marka}.csv", "a", encoding="utf-8", newline='')
+                        text_zzap = f"{marka} {model} {version} {year}г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap_text} Склад: 3_{price}_PB_{num_provider}. {status_new}.".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".")
+                        #text_drom = f"{name_zap} {marka} {model} {version} {year} г.в., {fuel}, {volume}, {car_body}. Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap_text} Склад: 3_{price}_PB_{num_provider}. {status_new}. Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения, где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!".replace(" ,","").replace("..",".").replace(" .",".").replace("  .",".").replace("., .",".").replace(".,  .",".").replace("  "," ")
+                        text_drom = f"{name_zap} {marka} {model} {version} {year}г.в., {fuel}, {volume}, {car_body}. Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap_text} Склад: 3_{price}_PB_{num_provider}. {status_new}. Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения, где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".")
+                    
+                        
+                        file = open(f"{marka_vxod}_zzap.csv", "a", encoding="utf-8", newline='')
                         writer = csv.writer(file)
 
                         writer.writerow(
                             (
-                                href_to_zapchast,
-                                price,
-                                "0"+"_PB"+num_provider,
-                                artical,
+                                proizvoditel,
+                                one_num_zap,
                                 name_zap,
+                                text_zzap,
+                                price,
+                                status,
+                                "2-4 дня",
+                                foto,                                  
+                            )
+                        )
+
+                        file.close()
+                        file = open(f"{marka_vxod}_drom.csv", "a", encoding="utf-8", newline='')
+                        writer = csv.writer(file)
+
+                        writer.writerow(
+                            (
+                                f"АРТИКУЛ: D-{artical}",
+                                name_zap,
+                                status,
                                 marka,
                                 model,
-                                year,
+                                version,
+                                num_zap,
                                 volume,
-                                fuel,
-                                car_body,
-                                all_num_zap,
-                                info,
-                                order,
-                                status,
-                                foto,
-                                number_page                                   
+                                year,
+                                "",
+                                "",
+                                "",
+                                "",
+                                text_drom,
+                                "1",
+                                price,
+                                "под заказ",
+                                "2-4 дня",
+                                foto,                                   
                             )
                         )
                         file.close()
