@@ -340,22 +340,17 @@ def osnova(href, i, number_page):
                         num_zap_text = ""
                     else:
                         num_zap_text = f" Номер детали: {one_num_zap}, {num_zap}."
-                    
+                    print("Дошло до этого места")
+                    proizvoditel = marka
                     for m_in, m_out in prouz.items():
-                        if marka == m_in:
+                        print(m_in)
+                        if m_in in marka:
                             proizvoditel = m_out
-                        else:
-                            proizvoditel = marka
+                            print(proizvoditel,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
-                    text_zzap = f"{marka} {model} {version} {year} г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap_text} Склад: 3_{price}_PB_{num_provider}. {status_new}.".replace(",     "," ").replace("     ","")
+                    text_zzap = f"{marka} {model} {version} {year}г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap_text} Склад: 3_{price}_PB_{num_provider}. {status_new}.".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".")
                     #text_drom = f"{name_zap} {marka} {model} {version} {year} г.в., {fuel}, {volume}, {car_body}. Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap_text} Склад: 3_{price}_PB_{num_provider}. {status_new}. Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения, где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!".replace(" ,","").replace("..",".").replace(" .",".").replace("  .",".").replace("., .",".").replace(".,  .",".").replace("  "," ")
-                    text_drom = f"{name_zap} {marka} {model} {version} {year} г.в., {fuel}, {volume}, {car_body}."
-                    f"Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap_text} Склад: 3_{price}_PB_{num_provider}. {status_new}."
-                    f"Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно." 
-                    f"Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения,"
-                    f"где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). " 
-                    f"Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, "
-                    f"строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!".replace(",     "," ").replace("     ","")
+                    text_drom = f"{name_zap} {marka} {model} {version} {year}г.в., {fuel}, {volume}, {car_body}. Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap_text} Склад: 3_{price}_PB_{num_provider}. {status_new}. Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения, где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".")
                     file = open(f"{input_name}_zzap.csv", "a", encoding="utf-8", newline='')
                     writer = csv.writer(file)
 
