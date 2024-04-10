@@ -51,7 +51,8 @@ model_need_list = {}
 
 input_url = input("Введи ссылку c бамперочка -  ")
 input_name = input("Как назовем файл? - ")
-proxy = (input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - "))
+proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
+pricing = input("Введи цифру ценообразования от 1 до 5 - ")
 
 proxies = {
     'http': f'{proxy}',
@@ -133,7 +134,6 @@ def osnova(href, i, number_page):
         item = str(item)
         foto = " "
         version = "    "
-        foto = "https://bamper.by" + item[item.find('"tooltip_" src=') + 16 : item.find('title="Нажми,') -2]
         item = item[item.find("href")+7: item.find("target=") -2]
         #print(foto)
         href_to_zapchast = "https://bamper.by/" + item
@@ -158,9 +158,68 @@ def osnova(href, i, number_page):
                 for item_price in price_obj:
                     price = str(item_price)
                     price = price[price.find("~") + 1 : price.find("$")]
+                price = int(price)
                 print( price, " Цена в долларах")
-                if int(price) >= 5:
+                if price >= 5:
                     print("больше 5")
+                    if int(pricing) == 3:
+                        print("Цена в рублях будет по 3-ему ценообразованию")
+                        if (4<price <20):
+                            price_rub = price * 100 + 1500
+                        elif price == 20:
+                            price_rub = price * 170
+                        elif (20 < price <31) :
+                            price_rub = price * (186 -int(price))
+                        elif (30 < price < 34) :
+                            price_rub = price * 155
+                        elif (33 < price < 36) :
+                            price_rub = price * 154
+                        elif (35 < price < 39) :
+                            price_rub = price * 153
+                        elif (38 < price < 42) :
+                            price_rub = price * 152
+                        elif (42 <= price <= 46) :
+                            price_rub = price * 151
+                        elif (47 <= price <= 53) :
+                            price_rub = price * 150
+                        elif (54 <= price <= 70) :
+                            price_rub = price * 149
+                        elif (71 <= price <= 81) :
+                            price_rub = price * 148
+                        elif (82 <= price <= 87) :
+                            price_rub = price * 147
+                        elif (88 <= price <= 93) :
+                            price_rub = price * 146
+                        elif (94 <= price <= 102) :
+                            price_rub = price * 145
+                        elif (103 <= price <= 113) :
+                            price_rub = price * 144
+                        elif (114 <= price <= 125) :
+                            price_rub = price * 143
+                        elif (126 <= price <= 135) :
+                            price_rub = price * 142
+                        elif (136 <= price <= 192) :
+                            price_rub = price * 141
+                        elif (193 <= price <= 215) :
+                            price_rub = price * 140
+                        elif (216 <= price <= 235) :
+                            price_rub = price * 139
+                        elif 236 <= price <= 907 :
+                            price_rub = price * 138
+                        elif (908 <= price <= 1245) :
+                            price_rub = price * 137
+                        elif (1246 <= price <= 1752) :
+                            price_rub = price * 136
+                        elif 1753 <= price :
+                            price_rub = price * 135
+                        #print("до сюда дошло")
+                        price_rub -=price_rub - 100
+                    else:
+                        print(f"О ценообразовании №{pricing} нет информация а таблицах эксель будет сохраняться цена в долларах$(закупочная)!!!!")
+                        price_rub = price
+                            
+
+
                     marka_obj = soup.find_all("span", itemprop="name")
                     
                     for item_marka in marka_obj:
@@ -179,7 +238,7 @@ def osnova(href, i, number_page):
                         if "John" in marka:
                             marka = "John Deer"
                         marka_len = len(marka)+1
-                        model_string = model_and_year[marka_len : ]
+                        model_string = model_and_year[marka_len : model_and_year.find("(")]
                         model = model_string[: model_string.find(",")].replace(",","").replace("   "," ").replace("  "," ").rstrip()
                         #version = model_string[model_string.find(" ")+1 : model_string.find(",")]                       
                         year = model_and_year[model_and_year.find("г.")-5 : model_and_year.find("г.")].replace(",","").replace('"',"")
@@ -240,6 +299,13 @@ def osnova(href, i, number_page):
                     if "новая з/ч" in str(href_part):
                         status = "новая"   
                     print(status, "СТАТУС")
+                    
+                    
+                    foto_href = str(soup.find_all("img", itemprop="image"))
+                    print(foto_href, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                    foto = "https://bamper.by" + foto_href[foto_href.find('src=') + 5 : foto_href.find('"/>')]
+                    print(foto, "ССЫЛКА НА ФОТОГРАФИИ!!!!!!!!!!!!!!!!")
+
 
                     if foto != "https://bamper.by/local/templates/bsclassified/images/nophoto_car.png":
                         try:
@@ -286,10 +352,12 @@ def osnova(href, i, number_page):
                             except UnidentifiedImageError:
                                     foto = "Битая фотка"
                                     print("Битая фотка")
+                                    foto = "http://171.25.166.53/~Reppart/reppart/"+ name_href + ".png"
                                     #os.remove(f"{folder_name}/{name_href}.png")
                         except Exception:
                             print("Какая-то хуйня с ссылкой на фотографию")
-                            foto = " "
+                            #foto = " "
+                            print(foto) 
                     else:
                         foto = "Нет фотографии"
                         print(name_href , "без фотки")
@@ -348,9 +416,9 @@ def osnova(href, i, number_page):
                             proizvoditel = m_out
                             print(proizvoditel,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
-                    text_zzap = f"{marka} {model} {version} {year}г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap_text} Склад: 3_{price}_PB_{num_provider}. {status_new}.".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".")
+                    text_zzap = f"{marka} {model} {version} {year}г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap_text} Склад: {pricing}_{price}_PB_{num_provider}. {status_new}.".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
                     #text_drom = f"{name_zap} {marka} {model} {version} {year} г.в., {fuel}, {volume}, {car_body}. Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap_text} Склад: 3_{price}_PB_{num_provider}. {status_new}. Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения, где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!".replace(" ,","").replace("..",".").replace(" .",".").replace("  .",".").replace("., .",".").replace(".,  .",".").replace("  "," ")
-                    text_drom = f"{name_zap} {marka} {model} {version} {year}г.в., {fuel}, {volume}, {car_body}. Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap_text} Склад: 3_{price}_PB_{num_provider}. {status_new}. Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения, где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".")
+                    text_drom = f"{name_zap} {marka} {model} {version} {year}г.в., {fuel}, {volume}, {car_body}. Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap_text} Склад: {pricing}_{price}_PB_{num_provider}. {status_new}. Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения, где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
                     file = open(f"{input_name}_zzap.csv", "a", encoding="utf-8", newline='')
                     writer = csv.writer(file)
 
@@ -360,7 +428,7 @@ def osnova(href, i, number_page):
                             one_num_zap,
                             name_zap,
                             text_zzap,
-                            price,
+                            price_rub,
                             status,
                             "2-4 дня",
                             foto,                                  
@@ -388,7 +456,7 @@ def osnova(href, i, number_page):
                             "",
                             text_drom,
                             "1",
-                            price,
+                            price_rub,
                             "под заказ",
                             "2-4 дня",
                             foto,                                   
