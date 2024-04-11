@@ -58,10 +58,16 @@ file1.close
 marka_need_list = {}
 model_need_list = {}       
 
-marka_vxod = input("Какую марку будем парсить, выбирай из четырёх audi, bmw, mercedes или volkswagen - ")
+marka_vxod = input("Какую марку будем парсить, выбирай из четырёх Audi, BMW, Mercedes или Volkswagen - ")
 num_vxod = input("на какой странице ты остановился, если начало жми 0 - ")
 pricing = input("Введи цифру ценообразования от 1 до 5 - ")
-marka_vxod_in = "marka_" + marka_vxod
+proxy = (input("Введи прокси в формате Fyq9HlP0zQLj4o:Nylesszpg@46.8.158.109:54376 - "))
+
+proxies = {
+    'http': f'{proxy}',
+    'https': f'{proxy}'
+}
+marka_vxod_in = "marka_" + marka_vxod.lower()
 
 folder_name =f"{marka_vxod}_" + time.strftime('%Y-%m-%d')
 if os.path.exists(folder_name):
@@ -128,7 +134,7 @@ def osnova(href, n, marka, model, name_zap, number_page):
     item_href_page = href[:-1]  + str(n)
     print(item_href_page)
     
-    req = requests.get(url=item_href_page, headers=headers)
+    req = requests.get(url=item_href_page, headers=headers, proxies=proxies)
     src = req.text
     soup_1 = BeautifulSoup(src, 'html.parser')
     href_part = soup_1.find_all("div", class_="add-image")
@@ -150,7 +156,7 @@ def osnova(href, n, marka, model, name_zap, number_page):
         print(num_provider)
         if num_provider not in black_list:
             try:
-                req = requests.get(url=href_to_zapchast, headers=headers)
+                req = requests.get(url=href_to_zapchast, headers=headers, proxies=proxies)
                 src = req.text
 
                 soup = BeautifulSoup(src, 'html.parser')
@@ -292,7 +298,7 @@ def osnova(href, n, marka, model, name_zap, number_page):
                         print(foto, "ССЫЛКА НА ФОТОГРАФИИ!!!!!!!!!!!!!!!!")
                         if foto != "https://bamper.by/local/templates/bsclassified/images/nophoto_car.png":
                             try:
-                                img = requests.get(foto)
+                                img = requests.get(foto, headers=headers, proxies=proxies)
                                 img_option = open(f"{folder_name}/{name_href}.png", 'wb')
                                 img_option.write(img.content)
                                 img_option.close
@@ -393,7 +399,7 @@ def osnova(href, n, marka, model, name_zap, number_page):
                         print("Дошло до этого места")
                         proizvoditel = marka
                         for m_in, m_out in prouz.items():
-                            print(m_in)
+                            #print(m_in)
                             if m_in in marka:
                                 proizvoditel = m_out
                                 print(proizvoditel,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -448,7 +454,7 @@ def osnova(href, n, marka, model, name_zap, number_page):
                         )
                         file.close()
                         #os.remove(f"{name_href}.html")
-                        with requests.request("POST", href_to_zapchast, headers=headers) as report:
+                        with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
                             print('report: ', report)
                    
                     else:
@@ -460,7 +466,7 @@ def osnova(href, n, marka, model, name_zap, number_page):
 
         else:
             print(href_to_zapchast + " находится в black-list, уже ")
-            with requests.request("POST", href_to_zapchast, headers=headers) as report:
+            with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
                 print('report: ', report)
 
     href_part_pag = soup_1.find_all("ul", class_="pagination")
@@ -480,7 +486,7 @@ for item_href_model, name_zap  in catalog.items():
             print(item_href_model)
             print(name_zap)
             marka = marka_vxod
-            model = item_href_model[item_href_model.find("model")+6 : -1]
+            model = item_href_model[item_href_model.find("model")+6 : -1].capitalize()
             print( marka,  model)
             
             i = 1
