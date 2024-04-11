@@ -213,7 +213,7 @@ def osnova(href, i, number_page):
                         elif 1753 <= price :
                             price_rub = price * 135
                         #print("до сюда дошло")
-                        price_rub -=price_rub - 100
+                        price_rub -=price_rub %- 100
                     else:
                         print(f"О ценообразовании №{pricing} нет информация а таблицах эксель будет сохраняться цена в долларах$(закупочная)!!!!")
                         price_rub = price
