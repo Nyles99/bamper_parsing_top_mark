@@ -122,6 +122,7 @@ else:
                 "НАЛИЧИЕ",
                 "СРОК ДОСТАВКИ",
                 "ФОТО",
+                "Номер"
             )
         )
 with open('zapchast_and_href.json', encoding="utf-8") as file:
@@ -449,7 +450,8 @@ def osnova(href, n, marka, model, name_zap, number_page):
                                 price_rub,
                                 "под заказ",
                                 "2-4 дня",
-                                foto,                                   
+                                foto,
+                                number_page                                   
                             )
                         )
                         file.close()
