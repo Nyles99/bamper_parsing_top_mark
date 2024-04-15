@@ -58,7 +58,7 @@ file1.close
 marka_need_list = {}
 model_need_list = {}       
 
-marka_vxod = input("Какую марку будем парсить, выбирай из двух Kia и Hyindai - ")
+marka_vxod = input("Какую марку будем парсить, выбирай из двух Kia и Hyundai - ")
 num_vxod = input("на какой странице ты остановился, если начало жми 0 - ")
 pricing = input("Введи цифру ценообразования от 1 до 5 - ")
 proxy = (input("Введи прокси в формате Fyq9HlP0zQLj4o:Nylesszpg@46.8.158.109:54376 - "))
@@ -125,7 +125,7 @@ else:
                 "Номер"
             )
         )
-with open('Kia_hyindai.json', encoding="utf-8") as file:
+with open('Kia_hyundai.json', encoding="utf-8") as file:
     catalog = json.load(file)
 
 with open('prouzbod.json', encoding="utf-8") as file:
@@ -140,7 +140,7 @@ def osnova(href, n, marka, model, name_zap, number_page):
         src = req.text
         soup_1 = BeautifulSoup(src, 'html.parser')
         href_part = soup_1.find_all("div", class_="add-image")
-        print(href_part,"Здесь должна быть ссылка на запчасть!")
+        #print(href_part,"Здесь должна быть ссылка на запчасть!")
         for item in href_part:
             item = str(item)
             foto = " "
@@ -546,7 +546,7 @@ for item_href_model, name_zap  in catalog.items():
                 print()
                 #item_href_model = "https://bamper.by/zchbu/zapchast_bryzgovik/marka_audi/model_a1/"
                 item_href_model = item_href_model + "?ACTION=REWRITED3&FORM_DATA=" + item_href_model[item_href_model.find("zchbu")+6 : item_href_model.find("/marka")] + "%2Fmarka_" + item_href_model[item_href_model.find("/marka")+7 : item_href_model.find("/model")] + "%2Fmodel_" + item_href_model[item_href_model.find("/model_")+7 : -1] + "&PAGEN_1=1"
-                #osnova(item_href_model, i, marka, model, name_zap, number_page)
+                osnova(item_href_model, i, marka, model, name_zap, number_page)
             else:
                 print("Эта модель находится в black-liste, добрый вечер")
         else:
