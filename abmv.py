@@ -225,58 +225,53 @@ def osnova(href, n, marka, model, name_zap, number_page):
                             price_rub = price * 135
                         #print("до сюда дошло")
                         price_rub -=price_rub %- 100
-                    elif int(pricing) == 3:
+                    elif int(pricing) == 2:
                         #print("Цена в рублях будет по 3-ему ценообразованию")
                         if (4<price <20):
                             price_rub = price * 100 + 1500
                         elif price == 20:
-                            price_rub = price * 170
-                        elif (20 < price <31) :
-                            price_rub = price * (186 -int(price))
-                        elif (30 < price < 34) :
-                            price_rub = price * 155
-                        elif (33 < price < 36) :
-                            price_rub = price * 154
-                        elif (35 < price < 39) :
-                            price_rub = price * 153
-                        elif (38 < price < 42) :
-                            price_rub = price * 152
-                        elif (42 <= price <= 46) :
-                            price_rub = price * 151
-                        elif (47 <= price <= 53) :
-                            price_rub = price * 150
-                        elif (54 <= price <= 70) :
-                            price_rub = price * 149
-                        elif (71 <= price <= 81) :
-                            price_rub = price * 148
-                        elif (82 <= price <= 87) :
-                            price_rub = price * 147
-                        elif (88 <= price <= 93) :
-                            price_rub = price * 146
-                        elif (94 <= price <= 102) :
-                            price_rub = price * 145
-                        elif (103 <= price <= 113) :
-                            price_rub = price * 144
-                        elif (114 <= price <= 125) :
-                            price_rub = price * 143
-                        elif (126 <= price <= 135) :
                             price_rub = price * 142
-                        elif (136 <= price <= 192) :
-                            price_rub = price * 141
-                        elif (193 <= price <= 215) :
-                            price_rub = price * 140
-                        elif (216 <= price <= 235) :
-                            price_rub = price * 139
-                        elif 236 <= price <= 907 :
-                            price_rub = price * 138
-                        elif (908 <= price <= 1245) :
-                            price_rub = price * 137
-                        elif (1246 <= price <= 1752) :
-                            price_rub = price * 136
-                        elif 1753 <= price :
-                            price_rub = price * 135
+                        elif (20 < price <28) :
+                            price_rub = price * (162 -int(price))
+                        elif (28 < price < 30) :
+                            price_rub = price * 134
+                        elif (29 < price < 32) :
+                            price_rub = price * 133
+                        elif (31 < price < 34) :
+                            price_rub = price * 132
+                        elif (33 < price < 36) :
+                            price_rub = price * 131
+                        elif (36 <= price <= 38) :
+                            price_rub = price * 130
+                        elif (39 <= price <= 41) :
+                            price_rub = price * 129
+                        elif (42 <= price <= 44) :
+                            price_rub = price * 128
+                        elif (45 <= price <= 48) :
+                            price_rub = price * 127
+                        elif (49 <= price <= 85) :
+                            price_rub = price * 126
+                        elif (86 <= price <= 93) :
+                            price_rub = price * 125
+                        elif (94 <= price <= 103) :
+                            price_rub = price * 124
+                        elif (104 <= price <= 116) :
+                            price_rub = price * 123
+                        elif (117 <= price <= 130) :
+                            price_rub = price * 122
+                        elif (131 <= price <= 149) :
+                            price_rub = price * 121
+                        elif (150 <= price <= 219) :
+                            price_rub = price * 120
+                        elif (220 <= price <= 1039) :
+                            price_rub = price * 119
+                        elif (1040 <= price <= 1562) :
+                            price_rub = price * 118
+                        elif 1563 <= price :
+                            price_rub = price * 117
                         #print("до сюда дошло")
-                        price_rub -=price_rub %- 100    
+                        price_rub -=price_rub %- 100
+
                     else:
                         print(f"О ценообразовании №{pricing} нет информация а таблицах эксель будет сохраняться цена в долларах$(закупочная)!!!!")
                         price_rub = price
@@ -552,7 +547,7 @@ for item_href_model, name_zap  in catalog.items():
                 print()
                 #item_href_model = "https://bamper.by/zchbu/zapchast_bryzgovik/marka_audi/model_a1/"
                 item_href_model = item_href_model + "?ACTION=REWRITED3&FORM_DATA=" + item_href_model[item_href_model.find("zchbu")+6 : item_href_model.find("/marka")] + "%2Fmarka_" + item_href_model[item_href_model.find("/marka")+7 : item_href_model.find("/model")] + "%2Fmodel_" + item_href_model[item_href_model.find("/model_")+7 : -1] + "&PAGEN_1=1"
-                #osnova(item_href_model, i, marka, model, name_zap, number_page)
+                osnova(item_href_model, i, marka, model, name_zap, number_page)
             else:
                 print("Эта модель находится в black-liste, добрый вечер")
         else:
