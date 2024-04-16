@@ -131,16 +131,15 @@ with open('zapchast_and_href.json', encoding="utf-8") as file:
 with open('prouzbod.json', encoding="utf-8") as file:
     prouz = json.load(file)
 
-def osnova(href, n, marka, model, name_zap, number_page):
+def osnova(item_href_page, n, marka, model, name_zap, number_page):
     try:
-        item_href_page = href[:-1]  + str(n)
         print(item_href_page,"ссылка на страницу!!!!")
         
         req = requests.get(url=item_href_page, headers=headers, proxies=proxies)
         src = req.text
         soup_1 = BeautifulSoup(src, 'html.parser')
         href_part = soup_1.find_all("div", class_="add-image")
-        print(href_part,"Здесь должна быть ссылка на запчасть!")
+        #print(href_part,"Здесь должна быть ссылка на запчасть!")
         for item in href_part:
             item = str(item)
             foto = " "
@@ -296,7 +295,7 @@ def osnova(href, n, marka, model, name_zap, number_page):
                         all_num_zap = num_zap    
                         list_num_zap = num_zap.split()
                         print(list_num_zap, "Список номеров")"""
-                        print(num_zap, "Номер запчасти")
+                        #print(num_zap, "Номер запчасти")
                         one_num_zap = num_zap[ : num_zap.find(' ')].upper()
                         num_zap = num_zap.rstrip().replace(" ","; ")
                         
@@ -445,7 +444,7 @@ def osnova(href, n, marka, model, name_zap, number_page):
                             num_zap_text = ""
                         else:
                             num_zap_text = f" Номер детали: {one_num_zap}, {num_zap}."
-                        print("Дошло до этого места")
+                        #print("Дошло до этого места")
                         proizvoditel = marka
                         for m_in, m_out in prouz.items():
                             #print(m_in)
@@ -526,6 +525,10 @@ def osnova(href, n, marka, model, name_zap, number_page):
             print("переходим на следующую")
             n += 1
             if n < 61:
+                if 2<= n < 10: 
+                    item_href_page = item_href_page[ : -1] + str(n)
+                elif n > 9:
+                    item_href_page = item_href_page[ : -2] + str(n)
                 osnova(item_href_page, n, marka, model, name_zap, number_page)
     except Exception:
         print("Непонятная ошибка")
@@ -535,19 +538,22 @@ for item_href_model, name_zap  in catalog.items():
     if marka_vxod_in in item_href_model:
         if int(number_page) >= int(num_vxod):
             number_page += 1
-            print(item_href_model)
+            #print(item_href_model)
             print(name_zap)
             marka = marka_vxod
             model = item_href_model[item_href_model.find("model")+6 : -1].capitalize()
             print( marka,  model)
             if model not in black_model:
-                print(model)
-            
+                #print(model)
+                item_href_model = item_href_model + "god_2012-2024/"
                 i = 1
                 print()
-                #item_href_model = "https://bamper.by/zchbu/zapchast_bryzgovik/marka_audi/model_a1/"
-                item_href_model = item_href_model + "?ACTION=REWRITED3&FORM_DATA=" + item_href_model[item_href_model.find("zchbu")+6 : item_href_model.find("/marka")] + "%2Fmarka_" + item_href_model[item_href_model.find("/marka")+7 : item_href_model.find("/model")] + "%2Fmodel_" + item_href_model[item_href_model.find("/model_")+7 : -1] + "&PAGEN_1=1"
+                #print(item_href_model)
+                zapchast = item_href_model[item_href_model.find("zapchast_")+9 : item_href_model.find("/marka")]
+                item_href_model = f"{item_href_model}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fmarka_{marka}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
+                #print(item_href_model)
                 osnova(item_href_model, i, marka, model, name_zap, number_page)
+                
             else:
                 print("Эта модель находится в black-liste, добрый вечер")
         else:
