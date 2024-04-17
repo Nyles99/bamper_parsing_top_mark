@@ -31,7 +31,7 @@ options.add_argument("--disable-gpu")
 options.add_argument("--disable-infobars")# //https://stackoverflow.com/a/43840128/1689770
 options.add_argument("--enable-javascript")
 
-#options.add_argument("--proxy-server=31.204.2.182:9142")
+options.add_argument("--proxy-server=91.237.180.78:24523")
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
@@ -48,14 +48,17 @@ headers = {
 
 input_url = input("Введи ссылку c бамперочка без фильтра по годам, без прайса -  ")
 input_name = input("Как назовем файл? - ")
-#proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
+proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
 pricing = input("Введи цифру ценообразования от 1 до 5 - ")
 input_price = int(input("От какой суммы собираем в белках? - "))
 
-"""proxies = {
+proxies = {
     'http': f'{proxy}',
     'https': f'{proxy}'
-}"""
+}
+
+driver.get(url="https://dzen.ru/?yredirect=true")
+time.sleep(30)
 
 summa = 0
 black_list = []
@@ -175,7 +178,7 @@ def osnova():
         #print(num_provider)
         if num_provider not in black_list:
             try:
-                req = requests.get(url=href_to_zapchast, headers=headers)
+                req = requests.get(url=href_to_zapchast, headers=headers, proxies=proxies)
                 src = req.text
 
                 soup = BeautifulSoup(src, 'html.parser')
@@ -336,7 +339,7 @@ def osnova():
 
                     if foto != "https://bamper.by/local/templates/bsclassified/images/nophoto_car.png":
                         try:
-                            img = requests.get(foto)
+                            img = requests.get(foto, proxies=proxies)
                             img_option = open(f"{folder_name}/{name_href}.png", 'wb')
                             img_option.write(img.content)
                             img_option.close
@@ -491,7 +494,7 @@ def osnova():
                     )
                     file.close()
                     #os.remove(f"{name_href}.html")
-                    with requests.request("POST", href_to_zapchast, headers=headers) as report:
+                    with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
                         print('report: ', report)
                 
                     
@@ -502,7 +505,7 @@ def osnova():
 
         else:
             print(href_to_zapchast + " находится в black-list, уже ")
-            with requests.request("POST", href_to_zapchast, headers=headers) as report:
+            with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
                 print('report: ', report)
 
 
@@ -533,7 +536,7 @@ for item in count:
             page = int(num_page / 20)
             
             if page == 0:
-                page = 2
+                page = 1
             for i in range(1, page+2):
                 first_page = f"{input_url}price-ot_{input_price}/?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fprice-ot_{input_price}&PAGEN_1={i}"
                 #print("Перед функцией")
@@ -566,13 +569,14 @@ for item in count:
                         print(num_page, "Количество запчастей")
                         if 0 < num_page <1201:
                             page = int(num_page / 20)
-                            
-                            for i in range(1, page+1):
+                            if page == 0:
+                                page = 1
+                            for i in range(1, page+2):
                                 first_page = f"{first_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_{input_price}&more=Y&PAGEN_1={i}"
                                 #print("Перед функцией")
                                 osnova()
                         elif 1200 < num_page:
-                            for do in range (200,550,50):
+                            for do in range (int(input_price)+50,650,100):
                                 price_url = f"{input_url}god_{year}-{year}/price-ot_{do-50}/price-do_{do}/"
                                 driver.get(url=first_url)
                                 time.sleep(1)
@@ -595,8 +599,10 @@ for item in count:
                                         num_page = int(num_page.replace(" ",""))
                                         print(num_page, "Количество запчастей")    
                                         page = int(num_page / 20)
+                                        if page == 0:
+                                            page = 1
                                         if page < 61:
-                                            for i in range(1, page+1):
+                                            for i in range(1, page+2):
                                                 first_page = f"{price_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_{do-50}%2Fprice-do_{do}&more=Y&PAGEN_1={i}"
                                                 #print("Перед функцией")
                                                 osnova()
@@ -627,6 +633,8 @@ for item in count:
                                     num_page = int(num_page.replace(" ",""))
                                     print(num_page, "Количество запчастей")    
                                     page = int(num_page / 20)
+                                    if page == 0:
+                                        page = 1
                                     for i in range(1, page+2):
                                         first_page = f"{price_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_500&more=Y&PAGEN_1={i}"
                                         #print("Перед функцией")
