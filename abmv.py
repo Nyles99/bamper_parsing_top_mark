@@ -15,13 +15,42 @@ import shutil
 import csv
 from PIL import Image, UnidentifiedImageError
 import time
+proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
+ip = proxy[proxy.find("@")+1 : ]
+print(ip)
+options = webdriver.ChromeOptions()
+options.add_argument("--disable-blink-features=AutomationControlled")
+options.add_experimental_option('excludeSwitches', ['enable-logging'])
+#options.add_experimental_option('useAutomationExtension', False)
+options.add_argument('--ignore-certificate-errors')
+options.add_argument("start-maximized") # // https://stackoverflow.com/a/26283818/1689770
+options.add_argument("enable-automation")#  // https://stackoverflow.com/a/43840128/1689770
+#options.add_argument("--headless")#  // only if you are ACTUALLY running headless
+options.add_argument("--no-sandbox")# //https://stackoverflow.com/a/50725918/1689770
+options.add_argument("--disable-dev-shm-usage")# //https://stackoverflow.com/a/50725918/1689770
+options.add_argument("--disable-browser-side-navigation")# //https://stackoverflow.com/a/49123152/1689770
+options.add_argument("--disable-gpu")
+options.add_argument("--disable-infobars")# //https://stackoverflow.com/a/43840128/1689770
+options.add_argument("--enable-javascript")
 
+options.add_argument(f"--proxy-server={ip}")
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+    'source': '''
+        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Array:
+        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Promise:
+        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol:
+    '''
+})
 
 headers = {
     "Accept" : "application/json, text/javascript, */*; q=0.01",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
 }
 
+driver.get(url="https://dzen.ru/?yredirect=true")
+time.sleep(30)
 
 summa = 0
 black_list = []
@@ -61,7 +90,6 @@ model_need_list = {}
 marka_vxod = input("Какую марку будем парсить, выбирай из четырёх Audi, BMW, Mercedes или Volkswagen - ")
 num_vxod = input("на какой странице ты остановился, если начало жми 0 - ")
 pricing = input("Введи цифру ценообразования от 1 до 5 - ")
-proxy = (input("Введи прокси в формате Fyq9HlP0zQLj4o:Nylesszpg@46.8.158.109:54376 - "))
 
 proxies = {
     'http': f'{proxy}',
@@ -131,7 +159,7 @@ with open('zapchast_and_href.json', encoding="utf-8") as file:
 with open('prouzbod.json', encoding="utf-8") as file:
     prouz = json.load(file)
 
-def osnova(item_href_page, n, marka, model, name_zap, number_page):
+def osnova(item_href_page, marka, model, name_zap, number_page):
     try:
         print(item_href_page,"ссылка на страницу!!!!")
         
@@ -296,7 +324,7 @@ def osnova(item_href_page, n, marka, model, name_zap, number_page):
                         list_num_zap = num_zap.split()
                         print(list_num_zap, "Список номеров")"""
                         #print(num_zap, "Номер запчасти")
-                        one_num_zap = num_zap[ : num_zap.find(' ')].upper()
+                        one_num_zap = num_zap[ : num_zap.find(' ')]
                         num_zap = num_zap.rstrip().replace(" ","; ")
                         
                         artical_obj = soup.find_all("span", class_="data-type f13")
@@ -340,11 +368,12 @@ def osnova(item_href_page, n, marka, model, name_zap, number_page):
                             status = "новая"   
                         #print(status, "СТАТУС")
 
-                        foto_href = str(soup.find_all("img", itemprop="image"))
+                        foto_href = str(soup.find_all("div", class_="detail-image"))
                         #print(foto_href, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                         foto = "https://bamper.by" + foto_href[foto_href.find('src=') + 5 : foto_href.find('"/>')]
                         print(foto, "ССЫЛКА НА ФОТОГРАФИИ!!!!!!!!!!!!!!!!")
-                        if foto != "https://bamper.by/local/templates/bsclassified/images/nophoto_car.png":
+
+                        if "nophoto_car.png" not in foto:
                             try:
                                 img = requests.get(foto, headers=headers, proxies=proxies)
                                 img_option = open(f"{folder_name}/{name_href}.png", 'wb')
@@ -517,19 +546,6 @@ def osnova(item_href_page, n, marka, model, name_zap, number_page):
                 print(href_to_zapchast + " находится в black-list, уже ")
                 with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
                     print('report: ', report)
-
-        href_part_pag = soup_1.find_all("ul", class_="pagination")
-        if "След." in str(href_part_pag):
-            href_part_pag = str(href_part_pag)
-            #print(href_part)
-            print("переходим на следующую")
-            n += 1
-            if n < 61:
-                if 2<= n < 10: 
-                    item_href_page = item_href_page[ : -1] + str(n)
-                elif n > 9:
-                    item_href_page = item_href_page[ : -2] + str(n)
-                osnova(item_href_page, n, marka, model, name_zap, number_page)
     except Exception:
         print("Непонятная ошибка")
 
@@ -546,13 +562,46 @@ for item_href_model, name_zap  in catalog.items():
             if model not in black_model:
                 #print(model)
                 item_href_model = item_href_model + "god_2012-2024/"
-                i = 1
                 print()
                 #print(item_href_model)
                 zapchast = item_href_model[item_href_model.find("zapchast_")+9 : item_href_model.find("/marka")]
-                item_href_model = f"{item_href_model}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fmarka_{marka}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
+                #item_href_model = f"{item_href_model}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fmarka_{marka}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
                 #print(item_href_model)
-                osnova(item_href_model, i, marka, model, name_zap, number_page)
+                driver.get(url=item_href_model)
+                time.sleep(1)
+
+                with open(f"{marka}.html", "w", encoding="utf-8") as file:
+                    file.write(driver.page_source)
+
+                with open(f"{marka}.html", encoding="utf-8") as file:
+                    src = file.read()
+
+                soup = BeautifulSoup(src, 'html.parser')
+
+                count = soup.find_all("h5", class_="list-title js-var_iCount")
+                #print(count)
+                try:
+                    for item in count:
+                        item = str(item)
+                        if "<b>" in item:
+                            #print(item)
+                            num_page = item[item.find("<b>")+3: item.find("</b>")]
+                            num_page = int(num_page.replace(" ",""))
+                            print(num_page, "Количество запчастей")
+                            if num_page > 0:
+                                page = int(num_page/20)                                
+                                if page == 0:
+                                    page = 1
+                                if page > 59:
+                                    page = 59
+                                
+                                for i in range(page+2):
+                                    item_href_model = f"{item_href_model}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fmarka_{marka}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
+                                    #print("Перед функцией")
+                                    osnova(item_href_model, marka, model, name_zap, number_page)
+                except Exception:
+                    print("Ошибка в загрузке странице")
+
                 
             else:
                 print("Эта модель находится в black-liste, добрый вечер")

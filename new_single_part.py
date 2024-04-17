@@ -15,7 +15,9 @@ import shutil
 import csv
 from PIL import Image, UnidentifiedImageError
 import time
-
+proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
+ip = proxy[proxy.find("@")+1 : ]
+print(ip)
 options = webdriver.ChromeOptions()
 options.add_argument("--disable-blink-features=AutomationControlled")
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
@@ -31,7 +33,7 @@ options.add_argument("--disable-gpu")
 options.add_argument("--disable-infobars")# //https://stackoverflow.com/a/43840128/1689770
 options.add_argument("--enable-javascript")
 
-#options.add_argument("--proxy-server=188.119.120.30:40623")
+options.add_argument(f"--proxy-server={ip}")
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
@@ -52,10 +54,10 @@ input_name = input("Как назовем файл? - ")
 pricing = input("Введи цифру ценообразования от 1 до 5 - ")
 input_price = int(input("От какой суммы собираем в белках? - "))
 
-"""proxies = {
+proxies = {
     'http': f'{proxy}',
     'https': f'{proxy}'
-}"""
+}
 
 driver.get(url="https://dzen.ru/?yredirect=true")
 time.sleep(30)
@@ -178,7 +180,7 @@ def osnova():
         #print(num_provider)
         if num_provider not in black_list:
             try:
-                req = requests.get(url=href_to_zapchast, headers=headers)
+                req = requests.get(url=href_to_zapchast, headers=headers, proxies=proxies)
                 src = req.text
 
                 soup = BeautifulSoup(src, 'html.parser')
@@ -331,15 +333,14 @@ def osnova():
                     #print(status, "СТАТУС")
                     
                     
-                    foto_href = str(soup.find_all("img", itemprop="image"))
+                    foto_href = str(soup.find_all("div", class_="detail-image"))
                     #print(foto_href, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                     foto = "https://bamper.by" + foto_href[foto_href.find('src=') + 5 : foto_href.find('"/>')]
                     print(foto, "ССЫЛКА НА ФОТОГРАФИИ!!!!!!!!!!!!!!!!")
 
-
                     if "nophoto_car.png" not in foto:
                         try:
-                            img = requests.get(url=foto, headers=headers)
+                            img = requests.get(url=foto, headers=headers, proxies=proxies)
                             img_option = open(f"{folder_name}/{name_href}.png", 'wb')
                             img_option.write(img.content)
                             img_option.close
@@ -494,7 +495,7 @@ def osnova():
                     )
                     file.close()
                     #os.remove(f"{name_href}.html")
-                    with requests.request("POST", href_to_zapchast, headers=headers) as report:
+                    with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
                         print('report: ', report)
                 
                     
@@ -505,7 +506,7 @@ def osnova():
 
         else:
             print(href_to_zapchast + " находится в black-list, уже ")
-            with requests.request("POST", href_to_zapchast, headers=headers) as report:
+            with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
                 print('report: ', report)
 
 
