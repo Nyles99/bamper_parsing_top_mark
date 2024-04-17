@@ -31,7 +31,7 @@ options.add_argument("--disable-gpu")
 options.add_argument("--disable-infobars")# //https://stackoverflow.com/a/43840128/1689770
 options.add_argument("--enable-javascript")
 
-options.add_argument("--proxy-server=91.237.180.78:24523")
+#options.add_argument("--proxy-server=188.119.120.30:40623")
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
@@ -48,14 +48,14 @@ headers = {
 
 input_url = input("Введи ссылку c бамперочка без фильтра по годам, без прайса -  ")
 input_name = input("Как назовем файл? - ")
-proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
+#proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
 pricing = input("Введи цифру ценообразования от 1 до 5 - ")
 input_price = int(input("От какой суммы собираем в белках? - "))
 
-proxies = {
+"""proxies = {
     'http': f'{proxy}',
     'https': f'{proxy}'
-}
+}"""
 
 driver.get(url="https://dzen.ru/?yredirect=true")
 time.sleep(30)
@@ -178,7 +178,7 @@ def osnova():
         #print(num_provider)
         if num_provider not in black_list:
             try:
-                req = requests.get(url=href_to_zapchast, headers=headers, proxies=proxies)
+                req = requests.get(url=href_to_zapchast, headers=headers)
                 src = req.text
 
                 soup = BeautifulSoup(src, 'html.parser')
@@ -283,7 +283,7 @@ def osnova():
                         num_zap = num_zap.replace("далее","").replace(';',"*#")
                         
                     #print(num_zap, "Номер запчасти")
-                    one_num_zap = num_zap[ : num_zap.find(' ')].upper()
+                    one_num_zap = num_zap[ : num_zap.find(' ')]
                     num_zap = num_zap.rstrip().replace(" ","; ")
                     """all_num_zap = num_zap    
                     list_num_zap = num_zap.split()
@@ -339,7 +339,7 @@ def osnova():
 
                     if foto != "https://bamper.by/local/templates/bsclassified/images/nophoto_car.png":
                         try:
-                            img = requests.get(foto, proxies=proxies)
+                            img = requests.get(url=foto, headers=headers)
                             img_option = open(f"{folder_name}/{name_href}.png", 'wb')
                             img_option.write(img.content)
                             img_option.close
@@ -494,7 +494,7 @@ def osnova():
                     )
                     file.close()
                     #os.remove(f"{name_href}.html")
-                    with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
+                    with requests.request("POST", href_to_zapchast, headers=headers) as report:
                         print('report: ', report)
                 
                     
@@ -505,7 +505,7 @@ def osnova():
 
         else:
             print(href_to_zapchast + " находится в black-list, уже ")
-            with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
+            with requests.request("POST", href_to_zapchast, headers=headers) as report:
                 print('report: ', report)
 
 
@@ -524,60 +524,95 @@ soup = BeautifulSoup(src, 'html.parser')
 
 count = soup.find_all("h5", class_="list-title js-var_iCount")
 #print(count)
-for item in count:
-    item = str(item)
-    if "<b>" in item:
-        #print(item)
-        num_page = item[item.find("<b>")+3: item.find("</b>")]
-        num_page = int(num_page.replace(" ",""))
-        print(num_page, "Количество запчастей")
-        zapchast = input_url[input_url.find("zapchast_")+ 9 : -1 ]
-        if 0 < num_page <1201:
-            page = int(num_page / 20)
+try:
+    for item in count:
+        item = str(item)
+        if "<b>" in item:
+            #print(item)
+            num_page = item[item.find("<b>")+3: item.find("</b>")]
+            num_page = int(num_page.replace(" ",""))
+            print(num_page, "Количество запчастей")
+            zapchast = input_url[input_url.find("zapchast_")+ 9 : -1 ]
+            if 0 < num_page <1201:
+                page = int(num_page / 20)
+                
+                if page == 0:
+                    page = 1
+                for i in range(1, page+2):
+                    first_page = f"{input_url}price-ot_{input_price}/?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fprice-ot_{input_price}&PAGEN_1={i}"
+                    #print("Перед функцией")
+                    osnova()
             
-            if page == 0:
-                page = 1
-            for i in range(1, page+2):
-                first_page = f"{input_url}price-ot_{input_price}/?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fprice-ot_{input_price}&PAGEN_1={i}"
-                #print("Перед функцией")
-                osnova()
-        
-        
-        
-        elif 1200 < num_page:
-            for year in range(1980,2025):
-                first_url = f"{input_url}god_{year}-{year}/price-ot_{input_price}/"
-                driver.get(url=first_url)
-                time.sleep(1)
+            
+            
+            elif 1200 < num_page:
+                for year in range(1980,2025):
+                    first_url = f"{input_url}god_{year}-{year}/price-ot_{input_price}/"
+                    driver.get(url=first_url)
+                    time.sleep(1)
 
-                with open(f"{input_name}.html", "w", encoding="utf-8") as file:
-                    file.write(driver.page_source)
+                    with open(f"{input_name}.html", "w", encoding="utf-8") as file:
+                        file.write(driver.page_source)
 
-                with open(f"{input_name}.html", encoding="utf-8") as file:
-                    src = file.read()
+                    with open(f"{input_name}.html", encoding="utf-8") as file:
+                        src = file.read()
 
-                soup = BeautifulSoup(src, 'html.parser')
+                    soup = BeautifulSoup(src, 'html.parser')
 
-                count = soup.find_all("h5", class_="list-title js-var_iCount")
-                #print(count)
-                for item in count:
-                    item = str(item)
-                    if "<b>" in item:
-                        #print(item)
-                        num_page = item[item.find("<b>")+3: item.find("</b>")]
-                        num_page = int(num_page.replace(" ",""))
-                        print(num_page, "Количество запчастей")
-                        if 0 < num_page <1201:
-                            page = int(num_page / 20)
-                            if page == 0:
-                                page = 1
-                            for i in range(1, page+2):
-                                first_page = f"{first_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_{input_price}&more=Y&PAGEN_1={i}"
-                                #print("Перед функцией")
-                                osnova()
-                        elif 1200 < num_page:
-                            for do in range (int(input_price)+50,650,100):
-                                price_url = f"{input_url}god_{year}-{year}/price-ot_{do-50}/price-do_{do}/"
+                    count = soup.find_all("h5", class_="list-title js-var_iCount")
+                    #print(count)
+                    for item in count:
+                        item = str(item)
+                        if "<b>" in item:
+                            #print(item)
+                            num_page = item[item.find("<b>")+3: item.find("</b>")]
+                            num_page = int(num_page.replace(" ",""))
+                            print(num_page, "Количество запчастей")
+                            if 0 < num_page <1201:
+                                page = int(num_page / 20)
+                                if page == 0:
+                                    page = 1
+                                for i in range(1, page+2):
+                                    first_page = f"{first_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_{input_price}&more=Y&PAGEN_1={i}"
+                                    #print("Перед функцией")
+                                    osnova()
+                            elif 1200 < num_page:
+                                for do in range (int(input_price)+50,650,100):
+                                    price_url = f"{input_url}god_{year}-{year}/price-ot_{do-50}/price-do_{do}/"
+                                    driver.get(url=first_url)
+                                    time.sleep(1)
+
+                                    with open(f"{input_name}.html", "w", encoding="utf-8") as file:
+                                        file.write(driver.page_source)
+
+                                    with open(f"{input_name}.html", encoding="utf-8") as file:
+                                        src = file.read()
+
+                                    soup = BeautifulSoup(src, 'html.parser')
+
+                                    count = soup.find_all("h5", class_="list-title js-var_iCount")
+                                    #print(count)
+                                    for item in count:
+                                        item = str(item)
+                                        if "<b>" in item:
+                                            #print(item)
+                                            num_page = item[item.find("<b>")+3: item.find("</b>")]
+                                            num_page = int(num_page.replace(" ",""))
+                                            print(num_page, "Количество запчастей")    
+                                            page = int(num_page / 20)
+                                            if page == 0:
+                                                page = 1
+                                            if page < 61:
+                                                for i in range(1, page+2):
+                                                    first_page = f"{price_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_{do-50}%2Fprice-do_{do}&more=Y&PAGEN_1={i}"
+                                                    #print("Перед функцией")
+                                                    osnova()
+                                            else:
+                                                for i in range(1, 61):
+                                                    first_page = f"{price_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_{do-50}%2Fprice-do_{do}&more=Y&PAGEN_1={i}"
+                                                    #print("Перед функцией")
+                                                    osnova()
+                                price_url = f"{input_url}god_{year}-{year}/price-ot_{500}/"
                                 driver.get(url=first_url)
                                 time.sleep(1)
 
@@ -601,42 +636,11 @@ for item in count:
                                         page = int(num_page / 20)
                                         if page == 0:
                                             page = 1
-                                        if page < 61:
-                                            for i in range(1, page+2):
-                                                first_page = f"{price_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_{do-50}%2Fprice-do_{do}&more=Y&PAGEN_1={i}"
-                                                #print("Перед функцией")
-                                                osnova()
-                                        else:
-                                            for i in range(1, 61):
-                                                first_page = f"{price_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_{do-50}%2Fprice-do_{do}&more=Y&PAGEN_1={i}"
-                                                #print("Перед функцией")
-                                                osnova()
-                            price_url = f"{input_url}god_{year}-{year}/price-ot_{500}/"
-                            driver.get(url=first_url)
-                            time.sleep(1)
+                                        for i in range(1, page+2):
+                                            first_page = f"{price_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_500&more=Y&PAGEN_1={i}"
+                                            #print("Перед функцией")
+                                            osnova()
+except Exception:
+    print ("Неизвестная ошибка, что-то с сайтом")
 
-                            with open(f"{input_name}.html", "w", encoding="utf-8") as file:
-                                file.write(driver.page_source)
-
-                            with open(f"{input_name}.html", encoding="utf-8") as file:
-                                src = file.read()
-
-                            soup = BeautifulSoup(src, 'html.parser')
-
-                            count = soup.find_all("h5", class_="list-title js-var_iCount")
-                            #print(count)
-                            for item in count:
-                                item = str(item)
-                                if "<b>" in item:
-                                    #print(item)
-                                    num_page = item[item.find("<b>")+3: item.find("</b>")]
-                                    num_page = int(num_page.replace(" ",""))
-                                    print(num_page, "Количество запчастей")    
-                                    page = int(num_page / 20)
-                                    if page == 0:
-                                        page = 1
-                                    for i in range(1, page+2):
-                                        first_page = f"{price_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_500&more=Y&PAGEN_1={i}"
-                                        #print("Перед функцией")
-                                        osnova()
 a = input("Нажмите 1 и ENTER, чтобы закончить это сумасшествие - ")
