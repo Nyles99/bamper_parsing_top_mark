@@ -49,6 +49,7 @@ headers = {
 }
 
 input_url = input("Введи ссылку c бамперочка без фильтра по годам, без прайса -  ")
+input_year = int(input("С какого года начнем ? - "))
 input_name = input("Как назовем файл? - ")
 #proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
 pricing = input("Введи цифру ценообразования от 1 до 5 - ")
@@ -146,7 +147,8 @@ else:
 
 with open('prouzbod.json', encoding="utf-8") as file:
     prouz = json.load(file)
-url = f"{input_url}price-ot_{input_price}/"
+url = f"{input_url}god_{input_year}-2024/price-ot_{input_price}/"
+print(url)
 
 
 def osnova():
@@ -190,7 +192,7 @@ def osnova():
                 for item_price in price_obj:
                     price = str(item_price)
                     price = price[price.find("~") + 1 : price.find("$")]
-                price = int(price)
+                price = int(price.replace(" ",""))
                 print( price, " Цена в долларах")
                 if price >= 5:
                     #print("больше 5")
@@ -540,14 +542,14 @@ try:
                 if page == 0:
                     page = 1
                 for i in range(1, page+2):
-                    first_page = f"{input_url}price-ot_{input_price}/?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fprice-ot_{input_price}&PAGEN_1={i}"
+                    first_page = f"{input_url}god_{input_year}-2024/price-ot_{input_price}/?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{input_year}-2024%2Fprice-ot_{input_price}&PAGEN_1={i}"
                     #print("Перед функцией")
                     osnova()
             
             
             
             elif 1200 < num_page:
-                for year in range(1980,2025):
+                for year in range(input_year,2025):
                     first_url = f"{input_url}god_{year}-{year}/price-ot_{input_price}/"
                     driver.get(url=first_url)
                     time.sleep(1)
@@ -578,7 +580,7 @@ try:
                                     #print("Перед функцией")
                                     osnova()
                             elif 1200 < num_page:
-                                for do in range (int(input_price)+50,650,100):
+                                for do in range (int(input_price)+50,2050,200):
                                     price_url = f"{input_url}god_{year}-{year}/price-ot_{do-50}/price-do_{do}/"
                                     driver.get(url=first_url)
                                     time.sleep(1)
@@ -613,7 +615,7 @@ try:
                                                     first_page = f"{price_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_{do-50}%2Fprice-do_{do}&more=Y&PAGEN_1={i}"
                                                     #print("Перед функцией")
                                                     osnova()
-                                price_url = f"{input_url}god_{year}-{year}/price-ot_{500}/"
+                                price_url = f"{input_url}god_{year}-{year}/price-ot_{int(input_price)+500}/"
                                 driver.get(url=first_url)
                                 time.sleep(1)
 

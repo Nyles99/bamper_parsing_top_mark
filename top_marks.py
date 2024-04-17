@@ -83,7 +83,7 @@ file1.close
 marka_need_list = {}
 model_need_list = {}       
 
-with open('modelu.json', encoding="utf-8") as file:
+with open('modelu_ahtv.json', encoding="utf-8") as file:
     catalog = json.load(file)
 
 zapchast00_1200 = {}
@@ -123,7 +123,7 @@ for item_text, item_href_model in catalog.items():
 
         os.remove("2.html") 
 
-with open("zapchast_and_href.json", "a", encoding="utf-8") as file:
+with open("ahtv.json", "a", encoding="utf-8") as file:
     json.dump(zapchast_and_href, file, indent=4, ensure_ascii=False)
 
 a = input("Нажмите 1 и ENTER, чтобы закончить это сумасшествие  - ")

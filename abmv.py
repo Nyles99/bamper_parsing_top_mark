@@ -196,7 +196,7 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                     price = str(item_price)
                     price = price[price.find("~") + 1 : price.find("$")]
                 version = "    "
-                price = int(price)
+                price = int(price.replace(" ",""))
                 print( price, " Цена в долларах")
                 if price >= 5:
                     #print("больше 5")
