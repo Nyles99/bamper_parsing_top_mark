@@ -337,7 +337,7 @@ def osnova():
                     print(foto, "ССЫЛКА НА ФОТОГРАФИИ!!!!!!!!!!!!!!!!")
 
 
-                    if foto != "https://bamper.by/local/templates/bsclassified/images/nophoto_car.png":
+                    if "nophoto_car.png" not in foto:
                         try:
                             img = requests.get(url=foto, headers=headers)
                             img_option = open(f"{folder_name}/{name_href}.png", 'wb')
