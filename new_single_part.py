@@ -85,7 +85,7 @@ file1.close
 marka_need_list = {}
 model_need_list = {}       
 
-#https://bamper.by/zchbu/zapchast_steklo-lobovoe/god_2000-2001/price-ot_150/?more=Y
+#https://bamper.by/zchbu/zapchast_steklo-lobovoe/
 
 
 

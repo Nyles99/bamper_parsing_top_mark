@@ -1,3 +1,5 @@
+#Парсинг бампера для ссылок по маркам, моделям и годам, ничего лишнего
+
 import json
 from turtle import pd
 from selenium import webdriver
