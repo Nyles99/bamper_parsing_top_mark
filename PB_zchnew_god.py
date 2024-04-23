@@ -15,6 +15,11 @@ import shutil
 import csv
 from PIL import Image, UnidentifiedImageError
 import time
+import codecs
+
+
+num_vxod = int(input("на какой ссылке ты остановился, если начало жми 0 - "))
+start_page = int(input("на какой странице с запчастями ты остановился, если начало жми 0 - "))
 proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
 ip = proxy[proxy.find("@")+1 : ]
 print(ip)
@@ -43,10 +48,22 @@ driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
         delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol:
     '''
 })
-
 headers = {
     "Accept" : "application/json, text/javascript, */*; q=0.01",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+}
+
+
+
+input_name = "PB_zchnew_god"
+txx = "zchbu_god"
+#proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
+#pricing = input("Введи цифру ценообразования от 1 до 5 - ")
+#input_price = int(input("От какой суммы собираем в белках? - "))
+
+proxies = {
+    'http': f'{proxy}',
+    'https': f'{proxy}'
 }
 
 driver.get(url="https://dzen.ru/?yredirect=true")
@@ -55,8 +72,10 @@ time.sleep(30)
 summa = 0
 black_list = []
 black_model = []
+black_mark = []
+cculka = []
 
-file1 = open("black-list.txt", "r")
+file1 = codecs.open("black-list.txt", "r", "utf_8_sig")
 while True:
     # считываем строку
     line = file1.readline()
@@ -70,44 +89,52 @@ while True:
 # закрываем файл
 file1.close
 
-file1 = open("black-model.txt", "r")
+file2 = codecs.open(f"zchnew_god.txt", "r", "utf_8_sig")
 while True:
     # считываем строку
-    line = file1.readline()
+    line = file2.readline()
     line = line.replace("\n","").replace("'","").replace(" ","")
     # прерываем цикл, если строка пустая
     if not line:
         break
     # выводим строку
-    black_model.append(line)
-#print(black_list)
+    cculka.append(line)
+
 # закрываем файл
-file1.close
+file2.close
+
+file3 = codecs.open(f"black-mark.txt", "r", "utf_8_sig")
+while True:
+    # считываем строку
+    line = file3.readline()
+    line = line.replace("\n","").replace("'","").replace(" ","")
+    # прерываем цикл, если строка пустая
+    if not line:
+        break
+    # выводим строку
+    black_mark.append(line)
+# закрываем файл
+file3.close
+
 
 marka_need_list = {}
 model_need_list = {}       
 
-marka_vxod = input("Какую марку будем парсить, выбирай из четырёх Audi, BMW, Mercedes или Volkswagen - ")
-num_vxod = input("на какой странице ты остановился, если начало жми 0 - ")
-pricing = input("Введи цифру ценообразования от 1 до 5 - ")
+#https://bamper.by/zchbu/zapchast_steklo-lobovoe/god_2000-2001/price-ot_150/?more=Y
 
-proxies = {
-    'http': f'{proxy}',
-    'https': f'{proxy}'
-}
-marka_vxod_in = "marka_" + marka_vxod.lower()
 
-folder_name =f"{marka_vxod}_" + time.strftime('%Y-%m-%d')
+
+folder_name =f"{input_name}_" + time.strftime('%Y-%m-%d')
 if os.path.exists(folder_name):
     print("Папка уже есть")
 else:
     os.mkdir(folder_name)
 
 watermark = Image.open("moe.png")
-if os.path.exists(f"{marka_vxod}_zzap.csv"):
+if os.path.exists(f"{input_name}_zzap.csv"):
     print("файл csv уже есть")
 else:
-    with open(f"{marka_vxod}_zzap.csv", "w", encoding="utf-8") as file_data:
+    with open(f"{input_name}_zzap.csv", "w", encoding="utf-8") as file_data:
         writer = csv.writer(file_data)
 
         writer.writerow(
@@ -123,10 +150,10 @@ else:
             )
         )
 
-if os.path.exists(f"{marka_vxod}_drom.csv"):
+if os.path.exists(f"{input_name}_drom.csv"):
     print("файл csv уже есть")
 else:
-    with open(f"{marka_vxod}_drom.csv", "w", encoding="utf-8") as file_data:
+    with open(f"{input_name}_drom.csv", "w", encoding="utf-8") as file_data:
         writer = csv.writer(file_data)
 
         writer.writerow(
@@ -150,41 +177,48 @@ else:
                 "НАЛИЧИЕ",
                 "СРОК ДОСТАВКИ",
                 "ФОТО",
-                "Номер"
+                "Номер ссылки",
+                "Номер страницы"
             )
         )
-with open('zapchast_and_href.json', encoding="utf-8") as file:
-    catalog = json.load(file)
 
 with open('prouzbod.json', encoding="utf-8") as file:
     prouz = json.load(file)
 
-def osnova(item_href_page, marka, model, name_zap, number_page):
-    try:
-        print(item_href_page,"ссылка на страницу!!!!")
-        
-        req = requests.get(url=item_href_page, headers=headers, proxies=proxies)
-        src = req.text
-        soup_1 = BeautifulSoup(src, 'html.parser')
-        href_part = soup_1.find_all("div", class_="add-image")
-        #print(href_part,"Здесь должна быть ссылка на запчасть!")
-        for item in href_part:
-            item = str(item)
-            foto = " "
-            item = item[item.find("href")+7: item.find("target=") -2]
-            #print(foto)
-            href_to_zapchast = "https://bamper.by/" + item
-            #print(href_to_zapchast)
-            number_href_reverse = item[::-1]
-            number_href_reverse_second = number_href_reverse[1:]
-            number_href_reverse = number_href_reverse_second[: number_href_reverse_second.find("/")]
-            name_href = number_href_reverse[::-1]
-            name_href = name_href.replace("*","_").replace('%','_')
-            print(name_href)
-            num_provider = name_href[: name_href.find("-")]
-            print(num_provider, "Номер поставщика, дальше проверка на блек лист")
-            if num_provider not in black_list:
-            #try:
+
+
+
+def osnova():
+    print(first_page)
+    driver.get(url=first_page)
+    time.sleep(1)
+
+    with open(f"{input_name}.html", "w", encoding="utf-8") as file:
+        file.write(driver.page_source)
+
+    with open(f"{input_name}.html", encoding="utf-8") as file:
+        src = file.read()
+    soup_1 = BeautifulSoup(src, 'html.parser')
+    href_part = soup_1.find_all("div", class_="add-image")
+    #print(href_part)
+    for item in href_part:
+        item = str(item)
+        foto = " "
+        version = "    "
+        item = item[item.find("href")+7: item.find("target=") -2]
+        #print(foto)
+        href_to_zapchast = "https://bamper.by/" + item
+        print(href_to_zapchast)
+        number_href_reverse = item[::-1]
+        number_href_reverse_second = number_href_reverse[1:]
+        number_href_reverse = number_href_reverse_second[: number_href_reverse_second.find("/")]
+        name_href = number_href_reverse[::-1]
+        name_href = name_href.replace("*","_").replace('%','_')
+        #print(name_href)
+        num_provider = name_href[: name_href.find("-")]
+        #print(num_provider)
+        if num_provider not in black_list:
+            try:
                 req = requests.get(url=href_to_zapchast, headers=headers, proxies=proxies)
                 src = req.text
 
@@ -195,7 +229,6 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                 for item_price in price_obj:
                     price = str(item_price)
                     price = price[price.find("~") + 1 : price.find("$")]
-                version = "    "
                 price = int(price.replace(" ",""))
                 print( price, " Цена в долларах")
                 if price >= 5:
@@ -366,20 +399,37 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                             price_rub = price * 149
                         #print("до сюда дошло")
                         price_rub -=price_rub %- 100
-
                     else:
                         print(f"О ценообразовании №{pricing} нет информация а таблицах эксель будет сохраняться цена в долларах$(закупочная)!!!!")
                         price_rub = price
+                            
+
+
                     marka_obj = soup.find_all("span", itemprop="name")
                     
                     for item_marka in marka_obj:
                         all_title_name = str(item_marka)
-                        string = all_title_name[all_title_name.find("<b>") + 1 : ]
-                        model_and_year = string[string.find(' к ')+3 :]
+                        string = all_title_name[all_title_name.find("</b>") + 4 : ]
+                        name_zap = all_title_name[all_title_name.find("<b>") + 3 : all_title_name.find("</b>")]
                         
+                        model_and_year = string[string.find(' к ')+3 :]
+                        marka = model_and_year[ : model_and_year.find(" ")]
+                        if "Alfa" in marka:
+                            marka = "Alfa Romeo"
+                        if "Aston" in marka:
+                            marka = "Aston Martin"
+                        if "New" in marka:
+                            marka = "New Holland"
+                        if "John" in marka:
+                            marka = "John Deer"
+                        
+                        marka_len = len(marka)+1
+                        model_string = model_and_year[marka_len : model_and_year.find("(")]
+                        model = model_string[: model_string.find(",")].replace(",","").replace("   "," ").replace("  "," ").rstrip()
+                        #version = model_string[model_string.find(" ")+1 : model_string.find(",")]                       
                         year = model_and_year[model_and_year.find("г.")-5 : model_and_year.find("г.")].replace(",","").replace('"',"")
                     #print(year)
-                    if int(year) > 2011:
+                    if marka not in black_mark:
                         num_zap = " "
                         num_obj = soup.find_all("span", class_="media-heading cut-h-65")
                         #print(num_obj)
@@ -387,13 +437,13 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                             num_zap = str(item_num.text).replace("  ","").replace('"',"")
                             num_zap = num_zap.replace(",","").replace("\n","")
                             num_zap = num_zap.replace("далее","").replace(';',"*#")
-                        """print(num_zap, "Номер запчасти")
-                        all_num_zap = num_zap    
-                        list_num_zap = num_zap.split()
-                        print(list_num_zap, "Список номеров")"""
+                            
                         #print(num_zap, "Номер запчасти")
                         one_num_zap = num_zap[ : num_zap.find(' ')]
                         num_zap = num_zap.rstrip().replace(" ","; ")
+                        """all_num_zap = num_zap    
+                        list_num_zap = num_zap.split()
+                        print(list_num_zap, "Список номеров")"""
                         
                         artical_obj = soup.find_all("span", class_="data-type f13")
                         for item_artical in artical_obj:
@@ -403,9 +453,9 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                         #print(marka, model, year, price, number_href)
 
                                     
-                        status = "б/у"
-                        order = "    "    
-                        info = "    "
+                        status = "новая"
+                        order = "     "    
+                        info = "     "
                         info_obj = soup.find_all("span", class_="media-heading cut-h-375")
                         for item_info in info_obj:
                             info = str(item_info.text.replace("  ","").replace("\n",""))
@@ -435,7 +485,8 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                         if "новая з/ч" in str(href_part):
                             status = "новая"   
                         #print(status, "СТАТУС")
-
+                        
+                        
                         foto_href = str(soup.find_all("div", class_="detail-image"))
                         #print(foto_href, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                         foto = "https://bamper.by" + foto_href[foto_href.find('src=') + 5 : foto_href.find('"/>')]
@@ -443,7 +494,7 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
 
                         if "nophoto_car.png" not in foto:
                             try:
-                                img = requests.get(foto, headers=headers, proxies=proxies)
+                                img = requests.get(url=foto, headers=headers, proxies=proxies)
                                 img_option = open(f"{folder_name}/{name_href}.png", 'wb')
                                 img_option.write(img.content)
                                 img_option.close
@@ -484,13 +535,14 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                                     #os.remove("img.png")
                                     #print(f"{name_href} - неверный формат или ерунда")
                                 except UnidentifiedImageError:
-                                    foto = "Битая фотка"
-                                    print("Битая фотка")
-                                    #foto = "http://171.25.166.53/~Reppart/reppart/"+ name_href + ".png"
-                                    #os.remove(f"{folder_name}/{name_href}.png")
+                                        foto = "Битая фотка"
+                                        print("Битая фотка")
+                                        foto = "http://171.25.166.53/~Reppart/reppart/"+ name_href + ".png"
+                                        #os.remove(f"{folder_name}/{name_href}.png")
                             except Exception:
                                 print("Какая-то хуйня с ссылкой на фотографию")
-                                foto = "    "
+                                #foto = " "
+                                print(foto) 
                         else:
                             foto = "Нет фотографии"
                             print(name_href , "без фотки")
@@ -498,12 +550,12 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                         benzik_obj = soup.find_all("div", style="font-size: 17px;")
                         fuel = "    "
                         transmission = "    "
-                        engine = "    "
+                        #engine = " "
                         volume = "    "
                         car_body = "    "
                         # print(benzik_obj)
                         for item_benzik in benzik_obj:
-                            benzik = "    "
+                            benzik = " "
                             benzik = item_benzik.text.replace("  ","").replace("\n","")
                             if "л," in benzik:
                                 volume = benzik[benzik.find("л,") - 5 : benzik.find("л,") + 1]
@@ -547,14 +599,12 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                             #print(m_in)
                             if m_in in marka:
                                 proizvoditel = m_out
-                                print(proizvoditel,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                                #print(proizvoditel,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
                         text_zzap = f"{marka} {model} {version} {year}г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap_text} Склад: {pricing}_{price}_PB_{num_provider}. {status_new}.".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
-                    
-                        text_drom = f"{name_zap} {marka} {model} {version} {year}г.в., {fuel}, {volume}, {car_body}. Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap_text} Склад: {pricing}_{price}_PB_{num_provider}. {status_new}. Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения, где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
-                    
                         
-                        file = open(f"{marka_vxod}_zzap.csv", "a", encoding="utf-8", newline='')
+                        text_drom = f"{name_zap} {marka} {model} {version} {year}г.в., {fuel}, {volume}, {car_body}. Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap_text} Склад: {pricing}_{price}_PB_{num_provider}. {status_new}. Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения, где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
+                        file = open(f"{input_name}_zzap.csv", "a", encoding="utf-8", newline='')
                         writer = csv.writer(file)
 
                         writer.writerow(
@@ -569,9 +619,9 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                                 foto,                                  
                             )
                         )
-
                         file.close()
-                        file = open(f"{marka_vxod}_drom.csv", "a", encoding="utf-8", newline='')
+
+                        file = open(f"{input_name}_drom.csv", "a", encoding="utf-8", newline='')
                         writer = csv.writer(file)
 
                         writer.writerow(
@@ -595,87 +645,229 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                                 "под заказ",
                                 "2-4 дня",
                                 foto,
-                                number_page                                   
+                                number_page,
+                                start_page_now,                                  
                             )
                         )
                         file.close()
                         #os.remove(f"{name_href}.html")
                         with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
                             print('report: ', report)
-                
                     else:
-                        print(" Запчасть очень старая, мы такими не торгуем")
+                        print(f"Марка {marka} попала в black-list")
+                
+                    
                 else: 
                     print("Цена запчасти меньше 5$")
-                #except Exception:
-                #    print("какая-то хуйня с карточкой запчастей")
+            except Exception:
+                print("какая-то хуйня с карточкой запчастей")
 
-            else:
-                print(href_to_zapchast + " находится в black-list, уже ")
-                with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
-                    print('report: ', report)
-    except Exception:
-        print("Непонятная ошибка")
-
-number_page = 0
-for item_href_model, name_zap  in catalog.items():
-    if marka_vxod_in in item_href_model:
-        if int(number_page) >= int(num_vxod):
-            number_page += 1
-            #print(item_href_model)
-            print(name_zap)
-            marka = marka_vxod
-            model = item_href_model[item_href_model.find("model")+6 : -1].capitalize()
-            print( marka,  model)
-            if model not in black_model:
-                #print(model)
-                item_href_model = item_href_model + "god_2012-2024/"
-                print()
-                #print(item_href_model)
-                zapchast = item_href_model[item_href_model.find("zapchast_")+9 : item_href_model.find("/marka")]
-                #item_href_model = f"{item_href_model}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fmarka_{marka}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
-                #print(item_href_model)
-                driver.get(url=item_href_model)
-                time.sleep(1)
-
-                with open(f"{marka}.html", "w", encoding="utf-8") as file:
-                    file.write(driver.page_source)
-
-                with open(f"{marka}.html", encoding="utf-8") as file:
-                    src = file.read()
-
-                soup = BeautifulSoup(src, 'html.parser')
-
-                count = soup.find_all("h5", class_="list-title js-var_iCount")
-                #print(count)
-                try:
-                    for item in count:
-                        item = str(item)
-                        if "<b>" in item:
-                            #print(item)
-                            num_page = item[item.find("<b>")+3: item.find("</b>")]
-                            num_page = int(num_page.replace(" ",""))
-                            print(num_page, "Количество запчастей")
-                            if num_page > 0:
-                                page = int(num_page/20)                                
-                                if page == 0:
-                                    page = 1
-                                if page > 59:
-                                    page = 59
-                                
-                                for i in range(page+2):
-                                    item_href_model = f"{item_href_model}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fmarka_{marka}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
-                                    #print("Перед функцией")
-                                    osnova(item_href_model, marka, model, name_zap, number_page)
-                except Exception:
-                    print("Ошибка в загрузке странице")
-
-                
-            else:
-                print("Эта модель находится в black-liste, добрый вечер")
         else:
-            number_page += 1
-            
-        
+            print(href_to_zapchast + " находится в black-list, уже ")
+            with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
+                print('report: ', report)
+
+number_page = 0 
+start_page_now = 0 
+for url in cculka:
+    if int(num_vxod) <= number_page:
+        url = str(url)
+        number_page += 1 
+        pricing = int(str(url[-2: ]).replace("\r","").replace(" ",""))
+        url = url[ : -2]
+        print(pricing, url)
+        driver.get(url=url)
+        time.sleep(1)
+
+        with open(f"1.html", "w", encoding="utf-8") as file:
+            file.write(driver.page_source)
+    #   https://bamper.by/zchbu/god_2020-2020/price-ot_300/store_y/isused_y/?more=Y
+        with open(f"1.html", encoding="utf-8") as file:
+            src = file.read()
+        #mark = url[url.find("marka_")+ 6 : url.find("/model")]
+        #mod = url[url.find("model_")+ 6 : url.find("/god")]
+        year1 = url[url.find("/god_")+ 5 : url.find("/price")-5]
+        year2 = url[url.find("/god_")+ 10 : url.find("/price")]
+        pri = url[url.find("/price") + 10 : url.find("/store")]
+        soup = BeautifulSoup(src, 'html.parser')
+
+        count = soup.find_all("h5", class_="list-title js-var_iCount")
+        #print(count)
+        try:
+            for item in count:
+                item = str(item)
+                if "<b>" in item:
+                    #print(item)
+                    num_page = item[item.find("<b>")+3: item.find("</b>")]
+                    num_page = int(num_page.replace(" ",""))
+                    print(num_page, "Количество запчастей")
+                    
+                    if 0 < num_page <1201:
+                        page = int(num_page / 20)
+                        
+                        if page == 0:
+                            page = 1
+                        for i in range(1, page+2):
+                            if start_page <= start_page_now:
+                                #   https://bamper.by/zchbu/god_2020-2020/price-ot_300/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_2020-2020%2Fprice-ot_300%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=2
+                                #   https://bamper.by/zchbu/god_1981-2024/price-ot_1250/store_y/isnew_y/?ACTION=REWRITED3&FORM_DATA=god_1981-2024%2Fprice-ot_1250%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1=2
+                                first_page = f"{url}?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{pri}%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1={i}"
+                                #print("Перед функцией")
+                                start_page_now += 1
+                                osnova()
+                            else:
+                                start_page_now += 1
+                    
+                    
+                    
+                    
+                    elif 1200 < num_page:
+                        
+                        for do in range (int(pri),1000,10):
+                            #   https://bamper.by/zchbu/god_2020-2020/price-ot_300/price-do_310/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_2020-2020%2Fprice-ot_300%2Fprice-do_310%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=2
+                            price_url = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+10}/store_y/isnew_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+10}%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1=1"  
+                            driver.get(url=price_url)
+                            time.sleep(1)
+
+                            with open(f"1.html", "w", encoding="utf-8") as file:
+                                file.write(driver.page_source)
+
+                            with open(f"1.html", encoding="utf-8") as file:
+                                src = file.read()
+
+                            soup = BeautifulSoup(src, 'html.parser')
+
+                            count = soup.find_all("h5", class_="list-title js-var_iCount")
+                            #print(count)
+                            for item in count:
+                                item = str(item)
+                                if "<b>" in item:
+                                    #print(item)
+                                    num_page = item[item.find("<b>")+3: item.find("</b>")]
+                                    num_page = int(num_page.replace(" ",""))
+                                    print(num_page, "Количество запчастей")
+                                    if num_page != 0:    
+                                        page = int(num_page / 20)
+                                        if page == 0:
+                                            page = 1
+                                        for i in range(1, page+2):
+                                            if start_page <= start_page_now:
+                                                first_page = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+10}/store_y/isnew_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+10}%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1={i}"
+                                                #print("Перед функцией")
+                                                start_page_now += 1
+                                                osnova()
+                                            else:
+                                                start_page_now += 1
+
+                        for do in range (1000,2000,50):
+                            #   https://bamper.by/zchbu/god_2020-2020/price-ot_300/price-do_310/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_2020-2020%2Fprice-ot_300%2Fprice-do_310%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=2
+                            price_url = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+50}/store_y/isnew_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+50}%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1=1"  
+                            driver.get(url=price_url)
+                            time.sleep(1)
+
+                            with open(f"1.html", "w", encoding="utf-8") as file:
+                                file.write(driver.page_source)
+
+                            with open(f"1.html", encoding="utf-8") as file:
+                                src = file.read()
+
+                            soup = BeautifulSoup(src, 'html.parser')
+
+                            count = soup.find_all("h5", class_="list-title js-var_iCount")
+                            #print(count)
+                            for item in count:
+                                item = str(item)
+                                if "<b>" in item:
+                                    #print(item)
+                                    num_page = item[item.find("<b>")+3: item.find("</b>")]
+                                    num_page = int(num_page.replace(" ",""))
+                                    print(num_page, "Количество запчастей")
+                                    if num_page != 0:    
+                                        page = int(num_page / 20)
+                                        if page == 0:
+                                            page = 1
+                                        for i in range(1, page+2):
+                                            if start_page <= start_page_now:
+                                                first_page = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+50}/store_y/isnew_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+50}%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1={i}"
+                                                #print("Перед функцией")
+                                                start_page_now += 1
+                                                osnova()
+                                            else:
+                                                start_page_now += 1
+
+                        for do in range (2000,10000,500):
+                            #   https://bamper.by/zchbu/god_2020-2020/price-ot_300/price-do_310/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_2020-2020%2Fprice-ot_300%2Fprice-do_310%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=2
+                            price_url = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+500}/store_y/isnew_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+500}%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1=1"  
+                            driver.get(url=price_url)
+                            time.sleep(1)
+
+                            with open(f"1.html", "w", encoding="utf-8") as file:
+                                file.write(driver.page_source)
+
+                            with open(f"1.html", encoding="utf-8") as file:
+                                src = file.read()
+
+                            soup = BeautifulSoup(src, 'html.parser')
+
+                            count = soup.find_all("h5", class_="list-title js-var_iCount")
+                            #print(count)
+                            for item in count:
+                                item = str(item)
+                                if "<b>" in item:
+                                    #print(item)
+                                    num_page = item[item.find("<b>")+3: item.find("</b>")]
+                                    num_page = int(num_page.replace(" ",""))
+                                    print(num_page, "Количество запчастей")
+                                    if num_page != 0:    
+                                        page = int(num_page / 20)
+                                        if page == 0:
+                                            page = 1
+                                        for i in range(1, page+2):
+                                            if start_page <= start_page_now:
+                                                first_page = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+500}/store_y/isnew_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+500}%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1={i}"
+                                                #print("Перед функцией")
+                                                start_page_now += 1
+                                                osnova()
+                                            else:
+                                                start_page_now += 1
+                            
+                                        
+                            price_url =f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_10000/store_y/isnew_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_10000%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1=1"
+                            driver.get(url=price_url)
+                            time.sleep(1)
+
+                            with open(f"1.html", "w", encoding="utf-8") as file:
+                                file.write(driver.page_source)
+
+                            with open(f"1.html", encoding="utf-8") as file:
+                                src = file.read()
+
+                            soup = BeautifulSoup(src, 'html.parser')
+
+                            count = soup.find_all("h5", class_="list-title js-var_iCount")
+                            #print(count)
+                            for item in count:
+                                item = str(item)
+                                if "<b>" in item:
+                                    #print(item)
+                                    num_page = item[item.find("<b>")+3: item.find("</b>")]
+                                    num_page = int(num_page.replace(" ",""))
+                                    print(num_page, "Количество запчастей")    
+                                    if num_page != 0:    
+                                        page = int(num_page / 20)
+                                        if page == 0:
+                                            page = 1
+                                        for i in range(1, page+2):
+                                            if start_page <= start_page_now:
+                                                first_page = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_10000/store_y/isnew_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_10000%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1={i}"
+                                                #print("Перед функцией")
+                                                start_page_now += 1
+                                                osnova()
+                                            else:
+                                                start_page_now += 1
+        except Exception:
+            print ("Неизвестная ошибка, что-то с сайтом")
+    else:
+        number_page += 1
 
 a = input("Нажмите 1 и ENTER, чтобы закончить это сумасшествие - ")

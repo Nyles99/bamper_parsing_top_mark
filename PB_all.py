@@ -277,7 +277,7 @@ def osnova():
                             price_rub = price * 117
                         #print("до сюда дошло")
                         price_rub -=price_rub %- 100
-                    if int(pricing) == 4:
+                    elif int(pricing) == 4:
                         #print("Цена в рублях будет по 3-ему ценообразованию")
                         if (4<price <20):
                             price_rub = price * 100 + 1500
