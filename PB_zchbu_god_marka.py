@@ -18,9 +18,9 @@ import time
 import codecs
 
 
-num_vxod = int(input("на какой ссылке ты остановился, если начало жми 0 - "))
+num_vxod = int(input("на какой ссылке ты остановился, если начало жми 0 -  "))
 start_page = int(input("на какой странице с запчастями ты остановился, если начало жми 0 - "))
-proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
+proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 -  ")
 ip = proxy[proxy.find("@")+1 : ]
 print(ip)
 options = webdriver.ChromeOptions()
