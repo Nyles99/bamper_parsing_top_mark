@@ -832,39 +832,39 @@ for url in cculka:
                                                 start_page_now += 1
                             
                                         
-                            price_url =f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_10000/store_y/isnew_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_10000%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1=1"
-                            driver.get(url=price_url)
-                            time.sleep(1)
+                        price_url =f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_10000/store_y/isnew_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_10000%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1=1"
+                        driver.get(url=price_url)
+                        time.sleep(1)
 
-                            with open(f"1.html", "w", encoding="utf-8") as file:
-                                file.write(driver.page_source)
+                        with open(f"1.html", "w", encoding="utf-8") as file:
+                            file.write(driver.page_source)
 
-                            with open(f"1.html", encoding="utf-8") as file:
-                                src = file.read()
+                        with open(f"1.html", encoding="utf-8") as file:
+                            src = file.read()
 
-                            soup = BeautifulSoup(src, 'html.parser')
+                        soup = BeautifulSoup(src, 'html.parser')
 
-                            count = soup.find_all("h5", class_="list-title js-var_iCount")
-                            #print(count)
-                            for item in count:
-                                item = str(item)
-                                if "<b>" in item:
-                                    #print(item)
-                                    num_page = item[item.find("<b>")+3: item.find("</b>")]
-                                    num_page = int(num_page.replace(" ",""))
-                                    print(num_page, "Количество запчастей")    
-                                    if num_page != 0:    
-                                        page = int(num_page / 20)
-                                        if page == 0:
-                                            page = 1
-                                        for i in range(1, page+2):
-                                            if start_page <= start_page_now:
-                                                first_page = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_10000/store_y/isnew_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_10000%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1={i}"
-                                                #print("Перед функцией")
-                                                start_page_now += 1
-                                                osnova()
-                                            else:
-                                                start_page_now += 1
+                        count = soup.find_all("h5", class_="list-title js-var_iCount")
+                        #print(count)
+                        for item in count:
+                            item = str(item)
+                            if "<b>" in item:
+                                #print(item)
+                                num_page = item[item.find("<b>")+3: item.find("</b>")]
+                                num_page = int(num_page.replace(" ",""))
+                                print(num_page, "Количество запчастей")    
+                                if num_page != 0:    
+                                    page = int(num_page / 20)
+                                    if page == 0:
+                                        page = 1
+                                    for i in range(1, page+2):
+                                        if start_page <= start_page_now:
+                                            first_page = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_10000/store_y/isnew_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_10000%2Fstore_y%2Fisnew_y&more=Y&PAGEN_1={i}"
+                                            #print("Перед функцией")
+                                            start_page_now += 1
+                                            osnova()
+                                        else:
+                                            start_page_now += 1
         except Exception:
             print ("Неизвестная ошибка, что-то с сайтом")
     else:

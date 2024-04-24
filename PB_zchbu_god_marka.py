@@ -55,8 +55,8 @@ headers = {
 
 
 
-input_name = "PB_zchbu_god"
-txx = "zchbu_god"
+input_name = "PB_zchbu_god_marka"
+txx = "zchbu_god_marka"
 #proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
 #pricing = input("Введи цифру ценообразования от 1 до 5 - ")
 #input_price = int(input("От какой суммы собираем в белках? - "))
@@ -89,7 +89,7 @@ while True:
 # закрываем файл
 file1.close
 
-file2 = codecs.open(f"zchbu_god.txt", "r", "utf_8_sig")
+file2 = codecs.open(f"zchbu_god_marka.txt", "r", "utf_8_sig")
 while True:
     # считываем строку
     line = file2.readline()
@@ -474,7 +474,7 @@ def osnova():
                         #print(order, "ОРДЕР ЗДЕСЬ")
 
                         #print(info)
-                        if "новый" in info_lower:
+                        """if "новый" in info_lower:
                             status = "новая"
                         elif "новая" in info_lower:
                             status = "новая"
@@ -484,7 +484,7 @@ def osnova():
                             status = "новая"
                         if "новая з/ч" in str(href_part):
                             status = "новая"   
-                        #print(status, "СТАТУС")
+                        #print(status, "СТАТУС")"""
                         
                         
                         foto_href = str(soup.find_all("div", class_="detail-image"))
@@ -681,10 +681,10 @@ for url in cculka:
 
         with open(f"1.html", "w", encoding="utf-8") as file:
             file.write(driver.page_source)
-    #   https://bamper.by/zchbu/god_2020-2020/price-ot_300/store_y/isused_y/?more=Y
+    #   https://bamper.by/zchbu/marka_honda/god_2020-2020/price-ot_300/store_y/isused_y/?more=Y
         with open(f"1.html", encoding="utf-8") as file:
             src = file.read()
-        #mark = url[url.find("marka_")+ 6 : url.find("/model")]
+        mark = url[url.find("marka_")+ 6 : url.find("/god")]
         #mod = url[url.find("model_")+ 6 : url.find("/god")]
         year1 = url[url.find("/god_")+ 5 : url.find("/price")-5]
         year2 = url[url.find("/god_")+ 10 : url.find("/price")]
@@ -709,8 +709,8 @@ for url in cculka:
                             page = 1
                         for i in range(1, page+2):
                             if start_page <= start_page_now:
-                                #   https://bamper.by/zchbu/god_2020-2020/price-ot_300/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_2020-2020%2Fprice-ot_300%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=2
-                                first_page = f"{url}?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{pri}%2Fstore_y%2Fisused_y&more=Y&PAGEN_1={i}"
+                                #   https://bamper.by/zchbu/marka_honda/god_2020-2020/price-ot_300/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=marka_honda%2Fgod_2020-2020%2Fprice-ot_300%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=2
+                                first_page = f"{url}?ACTION=REWRITED3&FORM_DATA=marka_{mark}%2Fgod_{year1}-{year2}%2Fprice-ot_{pri}%2Fstore_y%2Fisused_y&more=Y&PAGEN_1={i}"
                                 #https://bamper.by/zchbu/marka_acura/model_ilx/god_2012-2024/price-ot_60/store_y/?ACTION=REWRITED3&FORM_DATA=marka_acura%2Fmodel_ilx%2Fgod_2012-2024%2Fprice-ot_60%2Fstore_y&more=Y&PAGEN_1=2
                                 #print("Перед функцией")
                                 start_page_now += 1
@@ -723,9 +723,9 @@ for url in cculka:
                     
                     elif 1200 < num_page:
                         
-                        for do in range (int(pri),1000,10):
-                            #   https://bamper.by/zchbu/god_2020-2020/price-ot_300/price-do_310/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_2020-2020%2Fprice-ot_300%2Fprice-do_310%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=2
-                            price_url = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+10}/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+10}%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=1"  
+                        for do in range (int(pri),1000,100):
+                            #   https://bamper.by/zchbu/marka_honda/god_2020-2020/price-ot_300/price-do_400/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=marka_honda%2Fgod_2020-2020%2Fprice-ot_300%2Fprice-do_400%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=2
+                            price_url = f"https://bamper.by/zchbu/marka_{mark}/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+100}/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=marka_{mark}%2Fgod_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+100}%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=1"  
                             driver.get(url=price_url)
                             time.sleep(1)
 
@@ -752,16 +752,16 @@ for url in cculka:
                                             page = 1
                                         for i in range(1, page+2):
                                             if start_page <= start_page_now:
-                                                first_page = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+10}/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+10}%2Fstore_y%2Fisused_y&more=Y&PAGEN_1={i}"
+                                                first_page = f"https://bamper.by/zchbu/marka_{mark}/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+100}/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=marka_{mark}%2Fgod_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+100}%2Fstore_y%2Fisused_y&more=Y&PAGEN_1={i}"
                                                 #print("Перед функцией")
                                                 start_page_now += 1
                                                 osnova()
                                             else:
                                                 start_page_now += 1
 
-                        for do in range (1000,2000,50):
+                        for do in range (1000,6000,500):
                             #   https://bamper.by/zchbu/god_2020-2020/price-ot_300/price-do_310/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_2020-2020%2Fprice-ot_300%2Fprice-do_310%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=2
-                            price_url = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+50}/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+50}%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=1"  
+                            price_url = f"https://bamper.by/zchbu/marka_{mark}/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+500}/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=marka_{mark}%2Fgod_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+500}%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=1"  
                             driver.get(url=price_url)
                             time.sleep(1)
 
@@ -788,51 +788,14 @@ for url in cculka:
                                             page = 1
                                         for i in range(1, page+2):
                                             if start_page <= start_page_now:
-                                                first_page = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+50}/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+50}%2Fstore_y%2Fisused_y&more=Y&PAGEN_1={i}"
+                                                first_page = f"https://bamper.by/zchbu/marka_{mark}/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+500}/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=marka_{mark}%2Fgod_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+500}%2Fstore_y%2Fisused_y&more=Y&PAGEN_1={i}"
                                                 #print("Перед функцией")
                                                 start_page_now += 1
                                                 osnova()
                                             else:
                                                 start_page_now += 1
-
-                        for do in range (2000,10000,500):
-                            #   https://bamper.by/zchbu/god_2020-2020/price-ot_300/price-do_310/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_2020-2020%2Fprice-ot_300%2Fprice-do_310%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=2
-                            price_url = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+500}/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+500}%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=1"  
-                            driver.get(url=price_url)
-                            time.sleep(1)
-
-                            with open(f"1.html", "w", encoding="utf-8") as file:
-                                file.write(driver.page_source)
-
-                            with open(f"1.html", encoding="utf-8") as file:
-                                src = file.read()
-
-                            soup = BeautifulSoup(src, 'html.parser')
-
-                            count = soup.find_all("h5", class_="list-title js-var_iCount")
-                            #print(count)
-                            for item in count:
-                                item = str(item)
-                                if "<b>" in item:
-                                    #print(item)
-                                    num_page = item[item.find("<b>")+3: item.find("</b>")]
-                                    num_page = int(num_page.replace(" ",""))
-                                    print(num_page, "Количество запчастей")
-                                    if num_page != 0:    
-                                        page = int(num_page / 20)
-                                        if page == 0:
-                                            page = 1
-                                        for i in range(1, page+2):
-                                            if start_page <= start_page_now:
-                                                first_page = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_{do}/price-do_{int(do)+500}/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_{do}%2Fprice-do_{int(do)+500}%2Fstore_y%2Fisused_y&more=Y&PAGEN_1={i}"
-                                                #print("Перед функцией")
-                                                start_page_now += 1
-                                                osnova()
-                                            else:
-                                                start_page_now += 1
-                            
-                                        
-                        price_url =f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_10000/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_10000%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=1"
+                                              
+                        price_url =f"https://bamper.by/zchbu/marka_{mark}/god_{year1}-{year2}/price-ot_6000/store_y/isused_y/?more=Y?ACTION=REWRITED3&FORM_DATA=marka_{mark}%2Fgod_{year1}-{year2}%2Fprice-ot_10000%2Fstore_y%2Fisused_y&more=Y&PAGEN_1=1"
                         driver.get(url=price_url)
                         time.sleep(1)
 
@@ -859,7 +822,7 @@ for url in cculka:
                                         page = 1
                                     for i in range(1, page+2):
                                         if start_page <= start_page_now:
-                                            first_page = f"https://bamper.by/zchbu/god_{year1}-{year2}/price-ot_10000/store_y/isused_y/?ACTION=REWRITED3&FORM_DATA=god_{year1}-{year2}%2Fprice-ot_10000%2Fstore_y%2Fisused_y&more=Y&PAGEN_1={i}"
+                                            first_page = f"https://bamper.by/zchbu/marka_{mark}/god_{year1}-{year2}/price-ot_6000/store_y/isused_y/?more=Y?ACTION=REWRITED3&FORM_DATA=marka_{mark}%2Fgod_{year1}-{year2}%2Fprice-ot_10000%2Fstore_y%2Fisused_y&more=Y&PAGEN_1={i}"
                                             #print("Перед функцией")
                                             start_page_now += 1
                                             osnova()
