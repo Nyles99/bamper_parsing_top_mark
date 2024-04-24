@@ -1,7 +1,3 @@
-Audi
-BMW
-Mercedes
-Volkswagen
 Asia
 Austin
 BAIC
