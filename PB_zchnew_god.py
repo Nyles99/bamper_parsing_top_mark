@@ -66,7 +66,7 @@ proxies = {
     'https': f'{proxy}'
 }
 
-driver.get(url="https://dzen.ru/?yredirect=true")
+driver.get(url="https://bamper.by/")
 time.sleep(30)
 
 summa = 0

@@ -37,7 +37,7 @@ soup_1 = BeautifulSoup(src, 'html.parser')
 href_part = soup_1.find_all("div", class_="add-image")
 print(href_part,"Здесь должна быть ссылка на запчасть!")"""
 cculka = []       
-file2 = open(f"zchbu_god.txt", "r")
+file2 = open(f"ot30000.txt", "r")
 while True:
     # считываем строку
     line = file2.readline()
@@ -55,8 +55,9 @@ for url in cculka:
     pricing = int(url[-1: ])
     url = url[ : -1]
     print(pricing, url)
-    sum = pricing + 1
-    print(sum)
+    if pricing == 4:
+        sum = pricing + 1
+        print(sum)
      
     
 
