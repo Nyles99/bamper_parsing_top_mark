@@ -74,7 +74,7 @@ file1 = open("black-model.txt", "r")
 while True:
     # считываем строку
     line = file1.readline()
-    line = line.replace("\n","").replace("'","").replace(" ","")
+    line = line.replace("\n","").replace("'","").replace(" ","").lower()
     # прерываем цикл, если строка пустая
     if not line:
         break
@@ -120,6 +120,7 @@ else:
                 "СОСТОЯНИЕ",
                 "СРОК ДОСТАВКИ",
                 "ФОТО",
+                "В НАЛИЧИИ"
             )
         )
 
@@ -150,7 +151,8 @@ else:
                 "НАЛИЧИЕ",
                 "СРОК ДОСТАВКИ",
                 "ФОТО",
-                "Номер"
+                "Номер",
+                "В НАЛИЧИИ"
             )
         )
 with open('zapchast_and_href.json', encoding="utf-8") as file:
@@ -159,7 +161,7 @@ with open('zapchast_and_href.json', encoding="utf-8") as file:
 with open('prouzbod.json', encoding="utf-8") as file:
     prouz = json.load(file)
 
-def osnova(item_href_page, marka, model, name_zap, number_page):
+def osnova():
     try:
         print(item_href_page,"ссылка на страницу!!!!")
         
@@ -374,9 +376,23 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                     
                     for item_marka in marka_obj:
                         all_title_name = str(item_marka)
-                        string = all_title_name[all_title_name.find("<b>") + 1 : ]
-                        model_and_year = string[string.find(' к ')+3 :]
+                        string = all_title_name[all_title_name.find("</b>") + 4 : ]
+                        name_zap = all_title_name[all_title_name.find("<b>") + 3 : all_title_name.find("</b>")]
                         
+                        model_and_year = string[string.find(' к ')+3 :]
+                        marka = model_and_year[ : model_and_year.find(" ")]
+                        if "Alfa" in marka:
+                            marka = "Alfa Romeo"
+                        if "Aston" in marka:
+                            marka = "Aston Martin"
+                        if "New" in marka:
+                            marka = "New Holland"
+                        if "John" in marka:
+                            marka = "John Deer"
+                        marka_len = len(marka)+1
+                        model_string = model_and_year[marka_len : model_and_year.find("(")]
+                        model = model_string[: model_string.find(",")].replace(",","").replace("   "," ").replace("  "," ").rstrip()
+                        #version = model_string[model_string.find(" ")+1 : model_string.find(",")]                       
                         year = model_and_year[model_and_year.find("г.")-5 : model_and_year.find("г.")].replace(",","").replace('"',"")
                     #print(year)
                     if int(year) > 2011:
@@ -566,7 +582,8 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                                 price_rub,
                                 status,
                                 "2-4 дня",
-                                foto,                                  
+                                foto,
+                                order,                                  
                             )
                         )
 
@@ -595,7 +612,8 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
                                 "под заказ",
                                 "2-4 дня",
                                 foto,
-                                number_page                                   
+                                number_page,
+                                order                                   
                             )
                         )
                         file.close()
@@ -620,53 +638,50 @@ def osnova(item_href_page, marka, model, name_zap, number_page):
 number_page = 0
 for item_href_model, name_zap  in catalog.items():
     if marka_vxod_in in item_href_model:
+        #   https://bamper.by/zchbu/zapchast_katalizator/marka_bmw/model_5/
+        #   https://bamper.by/zchbu/zapchast_katalizator/marka_bmw/model_5/god_2012-2024/?ACTION=REWRITED3&FORM_DATA=zapchast_katalizator%2Fmarka_bmw%2Fmodel_5%2Fgod_2012-2024&PAGEN_1=2
         if int(number_page) >= int(num_vxod):
             number_page += 1
             #print(item_href_model)
             print(name_zap)
-            marka = marka_vxod
-            model = item_href_model[item_href_model.find("model")+6 : -1].capitalize()
-            print( marka,  model)
+            mark = item_href_model[item_href_model.find("marka")+6 : item_href_model.find("/model")]
+            model = item_href_model[item_href_model.find("model")+6 : -1]
+            print(marka_vxod,  model)
             if model not in black_model:
-                #print(model)
                 item_href_model = item_href_model + "god_2012-2024/"
                 print()
-                #print(item_href_model)
-                zapchast = item_href_model[item_href_model.find("zapchast_")+9 : item_href_model.find("/marka")]
-                #item_href_model = f"{item_href_model}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fmarka_{marka}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
-                #print(item_href_model)
-                driver.get(url=item_href_model)
-                time.sleep(1)
-
-                with open(f"{marka}.html", "w", encoding="utf-8") as file:
-                    file.write(driver.page_source)
-
-                with open(f"{marka}.html", encoding="utf-8") as file:
-                    src = file.read()
-
-                soup = BeautifulSoup(src, 'html.parser')
-
-                count = soup.find_all("h5", class_="list-title js-var_iCount")
-                #print(count)
                 try:
+                    zapchast = item_href_model[item_href_model.find("zapchast_")+9 : item_href_model.find("/marka")]
+                    driver.get(url=item_href_model)
+                    time.sleep(1)
+
+                    with open(f"{marka_vxod}.html", "w", encoding="utf-8") as file:
+                        file.write(driver.page_source)
+
+                    with open(f"{marka_vxod}.html", encoding="utf-8") as file:
+                        src = file.read()
+
+                    soup = BeautifulSoup(src, 'html.parser')
+
+                    count = soup.find_all("h5", class_="list-title js-var_iCount")
+                    #print(count)
                     for item in count:
                         item = str(item)
                         if "<b>" in item:
                             #print(item)
                             num_page = item[item.find("<b>")+3: item.find("</b>")]
                             num_page = int(num_page.replace(" ",""))
+                            summa = summa + num_page
                             print(num_page, "Количество запчастей")
-                            if num_page > 0:
-                                page = int(num_page/20)                                
-                                if page == 0:
-                                    page = 1
-                                if page > 59:
-                                    page = 59
-                                
-                                for i in range(page+2):
-                                    item_href_model = f"{item_href_model}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fmarka_{marka}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
-                                    #print("Перед функцией")
-                                    osnova(item_href_model, marka, model, name_zap, number_page)
+                            if 0 < num_page < 21:
+                                item_href_page = item_href_model
+                                osnova()
+                            elif 20 < num_page:
+                                page = int(num_page / 20) + 1 
+                                for i in range(1, int(page)+1):
+                                    first_page = f"https://bamper.by/zchbu/zapchast_katalizator/marka_{marka_vxod}/model_{model}/god_2012-2024/?ACTION=REWRITED3&FORM_DATA=zapchast_katalizator%2Fmarka_{marka_vxod}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
+                                    #print (first_page)
+                                    osnova()
                 except Exception:
                     print("Ошибка в загрузке странице")
 
