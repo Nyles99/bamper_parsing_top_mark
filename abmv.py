@@ -49,7 +49,7 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
 }
 
-driver.get(url="https://dzen.ru/?yredirect=true")
+driver.get(url="https://bamper.by/")
 time.sleep(30)
 
 summa = 0
@@ -182,9 +182,9 @@ def osnova():
             number_href_reverse = number_href_reverse_second[: number_href_reverse_second.find("/")]
             name_href = number_href_reverse[::-1]
             name_href = name_href.replace("*","_").replace('%','_')
-            print(name_href)
+            #print(name_href)
             num_provider = name_href[: name_href.find("-")]
-            print(num_provider, "Номер поставщика, дальше проверка на блек лист")
+            #print(num_provider, "Номер поставщика, дальше проверка на блек лист")
             if num_provider not in black_list:
             #try:
                 req = requests.get(url=href_to_zapchast, headers=headers, proxies=proxies)
@@ -679,7 +679,7 @@ for item_href_model, name_zap  in catalog.items():
                             elif 20 < num_page:
                                 page = int(num_page / 20) + 1 
                                 for i in range(1, int(page)+1):
-                                    first_page = f"https://bamper.by/zchbu/zapchast_katalizator/marka_{marka_vxod}/model_{model}/god_2012-2024/?ACTION=REWRITED3&FORM_DATA=zapchast_katalizator%2Fmarka_{marka_vxod}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
+                                    first_page = f"https://bamper.by/zchbu/zapchast_{zapchast}/marka_{marka_vxod}/model_{model}/god_2012-2024/?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fmarka_{marka_vxod}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
                                     #print (first_page)
                                     osnova()
                 except Exception:
