@@ -386,6 +386,8 @@ def osnova():
                     #print(num_zap, "Номер запчасти")
                     one_num_zap = num_zap[ : num_zap.find(' ')]
                     num_zap = num_zap.rstrip().replace(" ","; ")
+                    if (int(len(num_zap)) - int(len(one_num_zap))) == 1:
+                            one_num_zap = num_zap
                     """all_num_zap = num_zap    
                     list_num_zap = num_zap.split()
                     print(list_num_zap, "Список номеров")"""

@@ -410,6 +410,8 @@ def osnova():
                         #print(num_zap, "Номер запчасти")
                         one_num_zap = num_zap[ : num_zap.find(' ')]
                         num_zap = num_zap.rstrip().replace(" ","; ")
+                        if (int(len(num_zap)) - int(len(one_num_zap))) == 1:
+                            one_num_zap = num_zap
                         
                         artical_obj = soup.find_all("span", class_="data-type f13")
                         for item_artical in artical_obj:
@@ -647,47 +649,45 @@ for item_href_model, name_zap  in catalog.items():
             mark = item_href_model[item_href_model.find("marka")+6 : item_href_model.find("/model")]
             model = item_href_model[item_href_model.find("model")+6 : -1]
             print(marka_vxod,  model)
-            if model not in black_model:
-                item_href_model = item_href_model + "god_2012-2024/"
-                print()
-                try:
-                    zapchast = item_href_model[item_href_model.find("zapchast_")+9 : item_href_model.find("/marka")]
-                    driver.get(url=item_href_model)
-                    time.sleep(1)
+            
+            item_href_model = item_href_model + "god_2012-2024/"
+            print()
+            try:
+                zapchast = item_href_model[item_href_model.find("zapchast_")+9 : item_href_model.find("/marka")]
+                driver.get(url=item_href_model)
+                time.sleep(1)
 
-                    with open(f"{marka_vxod}.html", "w", encoding="utf-8") as file:
-                        file.write(driver.page_source)
+                with open(f"{marka_vxod}.html", "w", encoding="utf-8") as file:
+                    file.write(driver.page_source)
 
-                    with open(f"{marka_vxod}.html", encoding="utf-8") as file:
-                        src = file.read()
+                with open(f"{marka_vxod}.html", encoding="utf-8") as file:
+                    src = file.read()
 
-                    soup = BeautifulSoup(src, 'html.parser')
+                soup = BeautifulSoup(src, 'html.parser')
 
-                    count = soup.find_all("h5", class_="list-title js-var_iCount")
-                    #print(count)
-                    for item in count:
-                        item = str(item)
-                        if "<b>" in item:
-                            #print(item)
-                            num_page = item[item.find("<b>")+3: item.find("</b>")]
-                            num_page = int(num_page.replace(" ",""))
-                            summa = summa + num_page
-                            print(num_page, "Количество запчастей")
-                            if 0 < num_page < 21:
-                                item_href_page = item_href_model
+                count = soup.find_all("h5", class_="list-title js-var_iCount")
+                #print(count)
+                for item in count:
+                    item = str(item)
+                    if "<b>" in item:
+                        #print(item)
+                        num_page = item[item.find("<b>")+3: item.find("</b>")]
+                        num_page = int(num_page.replace(" ",""))
+                        summa = summa + num_page
+                        print(num_page, "Количество запчастей")
+                        if 0 < num_page < 21:
+                            item_href_page = item_href_model
+                            osnova()
+                        elif 20 < num_page:
+                            page = int(num_page / 20) + 1 
+                            for i in range(1, int(page)+1):
+                                first_page = f"https://bamper.by/zchbu/zapchast_{zapchast}/marka_{marka_vxod}/model_{model}/god_2012-2024/?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fmarka_{marka_vxod}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
+                                #print (first_page)
                                 osnova()
-                            elif 20 < num_page:
-                                page = int(num_page / 20) + 1 
-                                for i in range(1, int(page)+1):
-                                    first_page = f"https://bamper.by/zchbu/zapchast_{zapchast}/marka_{marka_vxod}/model_{model}/god_2012-2024/?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fmarka_{marka_vxod}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
-                                    #print (first_page)
-                                    osnova()
-                except Exception:
-                    print("Ошибка в загрузке странице")
+            except Exception:
+                print("Ошибка в загрузке странице")
 
                 
-            else:
-                print("Эта модель находится в black-liste, добрый вечер")
         else:
             number_page += 1
             

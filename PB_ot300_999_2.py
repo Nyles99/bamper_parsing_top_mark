@@ -372,10 +372,13 @@ def osnova():
                         num_zap = str(item_num.text).replace("  ","").replace('"',"")
                         num_zap = num_zap.replace(",","").replace("\n","")
                         num_zap = num_zap.replace("далее","").replace(';',"*#")
+                    
                         
                     #print(num_zap, "Номер запчасти")
                     one_num_zap = num_zap[ : num_zap.find(' ')]
                     num_zap = num_zap.rstrip().replace(" ","; ")
+                    if (int(len(num_zap)) - int(len(one_num_zap))) == 1:
+                            one_num_zap = num_zap
                     """all_num_zap = num_zap    
                     list_num_zap = num_zap.split()
                     print(list_num_zap, "Список номеров")"""
