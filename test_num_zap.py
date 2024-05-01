@@ -23,14 +23,15 @@ headers = {
 }
 
 
-item_href_page = "https://bamper.by/zapchast_perednyaya-chast-nouskat-v-sbore/25054-DAW23748/"
+item_href_page = "https://bamper.by/zapchast_shleyf-rulya/9676-108946063/"
 
 
 req = requests.get(url=item_href_page, headers=headers)
+print(req)
 src = req.text
 soup = BeautifulSoup(src, 'html.parser')
 num_obj = soup.find_all("span", class_="media-heading cut-h-65")
-#print(num_obj)
+print(num_obj)
 for item_num in num_obj:
     num_zap = str(item_num.text).replace("  ","").replace('"',"")
     num_zap = num_zap.replace(",","").replace("\n","")
