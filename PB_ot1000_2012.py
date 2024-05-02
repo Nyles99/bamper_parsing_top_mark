@@ -537,6 +537,22 @@ def osnova():
                         if m_in in marka:
                             proizvoditel = m_out
                             #print(proizvoditel,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                    
+                    L_R = ""
+                    F_R = ""
+                    U_D = ""
+                    if "левый" or "левая" or "левой" or "левые" or "левого" or "левое" or "левые" in name_zap:
+                        L_R = "L"
+                    elif "правый" or "правая" or "правой" or "правые" or "правого" or "правое" or "правые" in name_zap:
+                        L_R = "R"
+                    if "задний" or "задняя" or "задней" or "заднего" or "Задняя" or "задних" or "заднее" or "задние" in name_zap:
+                        F_R = "R"
+                    elif "передний" or "передняя" or "передней" or "переднего" or "Передняя" or "передних" or "переднее" or "передние" in name_zap:
+                        F_R = "R"
+                    if "верхняя" in name_zap:
+                        U_D = "U"
+                    elif "нижняя" in name_zap:
+                        U_D = "D"
 
                     text_zzap = f"{marka} {model} {version} {year}г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap_text} Склад: {pricing}_{price}_PB_{num_provider}. {status_new}.".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
                     
@@ -572,9 +588,9 @@ def osnova():
                             num_zap,
                             volume,
                             year,
-                            "",
-                            "",
-                            "",
+                            L_R,
+                            F_R,
+                            U_D,
                             "",
                             text_drom,
                             "1",

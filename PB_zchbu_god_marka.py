@@ -603,6 +603,22 @@ def osnova():
                                 proizvoditel = m_out
                                 #print(proizvoditel,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
+                        L_R = ""
+                        F_R = ""
+                        U_D = ""
+                        if "левый" or "левая" or "левой" or "левые" or "левого" or "левое" or "левые" in name_zap:
+                            L_R = "L"
+                        elif "правый" or "правая" or "правой" or "правые" or "правого" or "правое" or "правые" in name_zap:
+                            L_R = "R"
+                        if "задний" or "задняя" or "задней" or "заднего" or "Задняя" or "задних" or "заднее" or "задние" in name_zap:
+                            F_R = "R"
+                        elif "передний" or "передняя" or "передней" or "переднего" or "Передняя" or "передних" or "переднее" or "передние" in name_zap:
+                            F_R = "R"
+                        if "верхняя" in name_zap:
+                            U_D = "U"
+                        elif "нижняя" in name_zap:
+                            U_D = "D"
+
                         text_zzap = f"{marka} {model} {version} {year}г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap_text} Склад: {pricing}_{price}_PB_{num_provider}. {status_new}.".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
                         
                         text_drom = f"{name_zap} {marka} {model} {version} {year}г.в., {fuel}, {volume}, {car_body}. Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap_text} Склад: {pricing}_{price}_PB_{num_provider}. {status_new}. Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения, где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
@@ -637,9 +653,9 @@ def osnova():
                                 num_zap,
                                 volume,
                                 year,
-                                "",
-                                "",
-                                "",
+                                L_R,
+                                F_R,
+                                U_D,
                                 "",
                                 text_drom,
                                 "1",
