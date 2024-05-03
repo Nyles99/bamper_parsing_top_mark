@@ -17,6 +17,13 @@ import shutil
 import csv
 from PIL import Image, UnidentifiedImageError
 import time
+import ftplib
+
+
+HOST = '171.25.166.53'
+PORT = 3121
+USER = 'Reppart'
+PASSWORD = 'Nikitos21@Artem'
 proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
 
 headers = {
@@ -60,12 +67,9 @@ file1.close
 marka_need_list = {}
 model_need_list = {}       
 
-#https://bamper.by/zchbu/zapchast_steklo-lobovoe/god_2000-2001/price-ot_150/?more=Y
+
 with open('zapchast00_1200.json', encoding="utf-8") as file:
     zapchast00_1200 = json.load(file)
-
-with open('zapchast1200.json', encoding="utf-8") as file:
-    zapchast1200 = json.load(file)
 
 
 folder_name =f"{input_name}_" + time.strftime('%Y-%m-%d')
@@ -470,6 +474,19 @@ def osnova():
                                 img.paste(watermark,(-230,1), watermark)
                                 img.save(f"{folder_name}/{name_href}.png", format="png")
                                 img_option.close
+
+                                ftp = ftplib.FTP()
+                                print(f'Conecting to FTP\nHost: {HOST}\nPort: {PORT}')
+                                ftp.connect(HOST, PORT)
+                                print(f'Conecting sucess!\nLogin as: {USER},Pass: 123456')
+                                ftp.login(USER, PASSWORD)  
+                                print('Login Succes!')
+                                #https://bamper.by/zapchast_shleyf-rulya/9676-108946063/
+                                """session = ftplib.FTP(host="171.25.166.53", PORT=3121, user="Reppart", passwd="Nikitos21@Artem")""" 
+                                file = open(f"{folder_name}/{name_href}.png", "rb")
+                                ftp.storbinary(f"STOR www/reppart/{name_href}.png", file)
+                                file.close()
+                                ftp.quit()
                                 #os.remove("img.png")
                                 #print(f"{name_href} - неверный формат или ерунда")
                             except UnidentifiedImageError:
@@ -545,14 +562,22 @@ def osnova():
                         L_R = "L"
                     elif "правый" or "правая" or "правой" or "правые" or "правого" or "правое" or "правые" in name_zap:
                         L_R = "R"
+                    else:
+                        L_R = ""
                     if "задний" or "задняя" or "задней" or "заднего" or "Задняя" or "задних" or "заднее" or "задние" in name_zap:
                         F_R = "R"
                     elif "передний" or "передняя" or "передней" or "переднего" or "Передняя" or "передних" or "переднее" or "передние" in name_zap:
                         F_R = "R"
+                    else:
+                        F_R = ""
                     if "верхняя" in name_zap:
                         U_D = "U"
                     elif "нижняя" in name_zap:
-                        U_D = "D"   
+                        U_D = "D"
+                    else:
+                        U_D = ""
+                    
+                    
                     text_zzap = f"{marka} {model} {version} {year}г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap_text} Склад: {pricing}_{price}_PB_{num_provider}. {status_new}.".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
                     
                     text_drom = f"{name_zap} {marka} {model} {version} {year}г.в., {fuel}, {volume}, {car_body}. Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap_text} Склад: {pricing}_{price}_PB_{num_provider}. {status_new}. Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения, где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
