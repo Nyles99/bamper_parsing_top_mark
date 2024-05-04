@@ -15,6 +15,13 @@ import shutil
 import csv
 from PIL import Image, UnidentifiedImageError
 import time
+import ftplib
+
+
+HOST = '171.25.166.53'
+PORT = 3121
+USER = 'Reppart'
+PASSWORD = 'Nikitos21@Artem'
 proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
 ip = proxy[proxy.find("@")+1 : ]
 print(ip)
@@ -55,6 +62,7 @@ time.sleep(30)
 summa = 0
 black_list = []
 black_model = []
+modeluabmv = []
 
 file1 = open("black-list.txt", "r")
 while True:
@@ -80,6 +88,20 @@ while True:
         break
     # выводим строку
     black_model.append(line)
+#print(black_list)
+# закрываем файл
+file1.close
+
+file1 = open("Modeliforabmv.txt", "r")
+while True:
+    # считываем строку
+    line = file1.readline()
+    line = line.replace("\n","").replace("'","").replace(" ","").lower()
+    # прерываем цикл, если строка пустая
+    if not line:
+        break
+    # выводим строку
+    modeluabmv.append(line)
 #print(black_list)
 # закрываем файл
 file1.close
@@ -491,7 +513,7 @@ def osnova():
 
 
 
-                                    foto = "http://171.25.166.53/~Reppart/reppart/"+ name_href + ".png"
+                                    foto = f"http://171.25.166.53/~Reppart/{marka_vxod}/"+ name_href + ".png"
                                     img = Image.open(f"{folder_name}/{name_href}.png")
                                     #print(foto)
                                     #img = Image.open(f"fotku/{name_href}.png")    
@@ -499,6 +521,19 @@ def osnova():
                                     img.paste(watermark,(-230,1), watermark)
                                     img.save(f"{folder_name}/{name_href}.png", format="png")
                                     img_option.close
+
+                                    ftp = ftplib.FTP()
+                                    print(f'Conecting to FTP\nHost: {HOST}\nPort: {PORT}')
+                                    ftp.connect(HOST, PORT)
+                                    print(f'Conecting sucess!\nLogin as: {USER},Pass: 123456')
+                                    ftp.login(USER, PASSWORD)  
+                                    print('Login Succes!')
+                                    #https://bamper.by/zapchast_shleyf-rulya/9676-108946063/
+                                    """session = ftplib.FTP(host="171.25.166.53", PORT=3121, user="Reppart", passwd="Nikitos21@Artem")""" 
+                                    file = open(f"{folder_name}/{name_href}.png", "rb")
+                                    ftp.storbinary(f"STOR www/{marka_vxod}/{name_href}.png", file)
+                                    file.close()
+                                    ftp.quit()
                                     #os.remove("img.png")
                                     #print(f"{name_href} - неверный формат или ерунда")
                                 except UnidentifiedImageError:
@@ -574,14 +609,20 @@ def osnova():
                             L_R = "L"
                         elif "правый" or "правая" or "правой" or "правые" or "правого" or "правое" or "правые" in name_zap:
                             L_R = "R"
+                        else:
+                            L_R = ""
                         if "задний" or "задняя" or "задней" or "заднего" or "Задняя" or "задних" or "заднее" or "задние" in name_zap:
                             F_R = "R"
                         elif "передний" or "передняя" or "передней" or "переднего" or "Передняя" or "передних" or "переднее" or "передние" in name_zap:
                             F_R = "R"
+                        else:
+                            F_R = ""
                         if "верхняя" in name_zap:
                             U_D = "U"
                         elif "нижняя" in name_zap:
                             U_D = "D"
+                        else:
+                            U_D = ""
 
                         text_zzap = f"{marka} {model} {version} {year}г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap_text} Склад: {pricing}_{price}_PB_{num_provider}. {status_new}.".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
                     
@@ -637,7 +678,7 @@ def osnova():
                         file.close()
                         #os.remove(f"{name_href}.html")
                         with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
-                            print('report: ', report)
+                            print ('report: ', report)
                 
                     else:
                         print(" Запчасть очень старая, мы такими не торгуем")
@@ -656,56 +697,63 @@ def osnova():
 number_page = 0
 for item_href_model, name_zap  in catalog.items():
     if marka_vxod_in in item_href_model:
-        #   https://bamper.by/zchbu/zapchast_katalizator/marka_bmw/model_5/
-        #   https://bamper.by/zchbu/zapchast_katalizator/marka_bmw/model_5/god_2012-2024/?ACTION=REWRITED3&FORM_DATA=zapchast_katalizator%2Fmarka_bmw%2Fmodel_5%2Fgod_2012-2024&PAGEN_1=2
-        if int(number_page) >= int(num_vxod):
-            number_page += 1
-            #print(item_href_model)
-            print(name_zap)
-            mark = item_href_model[item_href_model.find("marka")+6 : item_href_model.find("/model")]
-            model = item_href_model[item_href_model.find("model")+6 : -1]
-            print(marka_vxod,  model)
-            
-            item_href_model = item_href_model + "god_2012-2024/"
-            print()
-            try:
-                zapchast = item_href_model[item_href_model.find("zapchast_")+9 : item_href_model.find("/marka")]
-                driver.get(url=item_href_model)
-                time.sleep(1)
+        model = item_href_model[item_href_model.find("model")+6 : -1]
+        print(model)
+        if model in modeluabmv:
 
-                with open(f"{marka_vxod}.html", "w", encoding="utf-8") as file:
-                    file.write(driver.page_source)
-
-                with open(f"{marka_vxod}.html", encoding="utf-8") as file:
-                    src = file.read()
-
-                soup = BeautifulSoup(src, 'html.parser')
-
-                count = soup.find_all("h5", class_="list-title js-var_iCount")
-                #print(count)
-                for item in count:
-                    item = str(item)
-                    if "<b>" in item:
-                        #print(item)
-                        num_page = item[item.find("<b>")+3: item.find("</b>")]
-                        num_page = int(num_page.replace(" ",""))
-                        summa = summa + num_page
-                        print(num_page, "Количество запчастей")
-                        if 0 < num_page < 21:
-                            item_href_page = item_href_model
-                            osnova()
-                        elif 20 < num_page:
-                            page = int(num_page / 20) + 1 
-                            for i in range(1, int(page)+1):
-                                first_page = f"https://bamper.by/zchbu/zapchast_{zapchast}/marka_{marka_vxod}/model_{model}/god_2012-2024/?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fmarka_{marka_vxod}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
-                                #print (first_page)
-                                osnova()
-            except Exception:
-                print("Ошибка в загрузке странице")
-
+            #"https://bamper.by/zchbu/zapchast_pritsepnoe-ustroystvo-farkop/marka_audi/model_a1/"
+            #   https://bamper.by/zchbu/zapchast_katalizator/marka_bmw/model_5/
+            #   https://bamper.by/zchbu/zapchast_katalizator/marka_bmw/model_5/god_2012-2024/?ACTION=REWRITED3&FORM_DATA=zapchast_katalizator%2Fmarka_bmw%2Fmodel_5%2Fgod_2012-2024&PAGEN_1=2
+            if int(number_page) >= int(num_vxod):
+                number_page += 1
+                #print(item_href_model)
+                print(name_zap)
+                mark = item_href_model[item_href_model.find("marka")+6 : item_href_model.find("/model")]
                 
+                print(marka_vxod,  model)
+                
+                item_href_model = item_href_model + "god_2012-2024/"
+                print()
+                try:
+                    zapchast = item_href_model[item_href_model.find("zapchast_")+9 : item_href_model.find("/marka")]
+                    driver.get(url=item_href_model)
+                    time.sleep(1)
+
+                    with open(f"{marka_vxod}.html", "w", encoding="utf-8") as file:
+                        file.write(driver.page_source)
+
+                    with open(f"{marka_vxod}.html", encoding="utf-8") as file:
+                        src = file.read()
+
+                    soup = BeautifulSoup(src, 'html.parser')
+
+                    count = soup.find_all("h5", class_="list-title js-var_iCount")
+                    #print(count)
+                    for item in count:
+                        item = str(item)
+                        if "<b>" in item:
+                            #print(item)
+                            num_page = item[item.find("<b>")+3: item.find("</b>")]
+                            num_page = int(num_page.replace(" ",""))
+                            summa = summa + num_page
+                            print(num_page, "Количество запчастей")
+                            if 0 < num_page < 21:
+                                item_href_page = item_href_model
+                                osnova()
+                            elif 20 < num_page:
+                                page = int(num_page / 20) + 1 
+                                for i in range(1, int(page)+1):
+                                    first_page = f"https://bamper.by/zchbu/zapchast_{zapchast}/marka_{marka_vxod}/model_{model}/god_2012-2024/?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fmarka_{marka_vxod}%2Fmodel_{model}%2Fgod_2012-2024&PAGEN_1={i}"
+                                    #print (first_page)
+                                    osnova()
+                except Exception:
+                    print("Ошибка в загрузке странице")
+
+                    
+            else:
+                number_page += 1
         else:
-            number_page += 1
+            print(model, " Эта модель не в наших интересах!")
             
         
 

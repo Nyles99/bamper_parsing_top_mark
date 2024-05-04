@@ -17,6 +17,13 @@ import shutil
 import csv
 from PIL import Image, UnidentifiedImageError
 import time
+import ftplib
+
+
+HOST = '171.25.166.53'
+PORT = 3121
+USER = 'Reppart'
+PASSWORD = 'Nikitos21@Artem'
 proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
 
 headers = {
@@ -61,8 +68,8 @@ marka_need_list = {}
 model_need_list = {}       
 
 #https://bamper.by/zchbu/zapchast_steklo-lobovoe/god_2000-2001/price-ot_150/?more=Y
-with open('zapchast300_999_one_year.json', encoding="utf-8") as file:
-    zapchast300_999_one_year = json.load(file)
+with open('zapchastot300_2017.json', encoding="utf-8") as file:
+    zapchast300_999 = json.load(file)
 
 
 
@@ -372,7 +379,6 @@ def osnova():
                         num_zap = str(item_num.text).replace("  ","").replace('"',"")
                         num_zap = num_zap.replace(",","").replace("\n","")
                         num_zap = num_zap.replace("далее","").replace(';',"*#")
-                    
                         
                     #print(num_zap, "Номер запчасти")
                     one_num_zap = num_zap[ : num_zap.find(' ')]
@@ -470,6 +476,19 @@ def osnova():
                                 img.paste(watermark,(-230,1), watermark)
                                 img.save(f"{folder_name}/{name_href}.png", format="png")
                                 img_option.close
+
+                                ftp = ftplib.FTP()
+                                print(f'Conecting to FTP\nHost: {HOST}\nPort: {PORT}')
+                                ftp.connect(HOST, PORT)
+                                print(f'Conecting sucess!\nLogin as: {USER},Pass: 123456')
+                                ftp.login(USER, PASSWORD)  
+                                print('Login Succes!')
+                                #https://bamper.by/zapchast_shleyf-rulya/9676-108946063/
+                                """session = ftplib.FTP(host="171.25.166.53", PORT=3121, user="Reppart", passwd="Nikitos21@Artem")""" 
+                                file = open(f"{folder_name}/{name_href}.png", "rb")
+                                ftp.storbinary(f"STOR www/reppart/{name_href}.png", file)
+                                file.close()
+                                ftp.quit()
                                 #os.remove("img.png")
                                 #print(f"{name_href} - неверный формат или ерунда")
                             except UnidentifiedImageError:
@@ -546,14 +565,20 @@ def osnova():
                         L_R = "L"
                     elif "правый" or "правая" or "правой" or "правые" or "правого" or "правое" or "правые" in name_zap:
                         L_R = "R"
+                    else:
+                        L_R = ""
                     if "задний" or "задняя" or "задней" or "заднего" or "Задняя" or "задних" or "заднее" or "задние" in name_zap:
                         F_R = "R"
                     elif "передний" or "передняя" or "передней" or "переднего" or "Передняя" or "передних" or "переднее" or "передние" in name_zap:
                         F_R = "R"
+                    else:
+                        F_R = ""
                     if "верхняя" in name_zap:
                         U_D = "U"
                     elif "нижняя" in name_zap:
                         U_D = "D"
+                    else:
+                        U_D = ""
 
                     text_zzap = f"{marka} {model} {version} {year}г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap_text} Склад: {pricing}_{price}_PB_{num_provider}. {status_new}.".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
                     
@@ -619,7 +644,7 @@ def osnova():
                 print('report: ', report)
 
 last_page = 0
-for url, page in zapchast300_999_one_year.items():
+for url, page in zapchast300_999.items():
         #print(url)
         #print(page)
     #    https://bamper.by/zchbu/marka_acura/model_ilx/god_2016-2024/price-ot_300/price-do_999/store_y/?more=Y

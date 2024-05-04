@@ -1,3 +1,5 @@
+#Парсинг бампера для ссылок по маркам, моделям и годам, ничего лишнего
+
 import json
 from turtle import pd
 from selenium import webdriver
@@ -23,56 +25,29 @@ PORT = 3121
 USER = 'Reppart'
 PASSWORD = 'Nikitos21@Artem'
 proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
-ip = proxy[proxy.find("@")+1 : ]
-print(ip)
-options = webdriver.ChromeOptions()
-options.add_argument("--disable-blink-features=AutomationControlled")
-options.add_experimental_option('excludeSwitches', ['enable-logging'])
-#options.add_experimental_option('useAutomationExtension', False)
-options.add_argument('--ignore-certificate-errors')
-options.add_argument("start-maximized") # // https://stackoverflow.com/a/26283818/1689770
-options.add_argument("enable-automation")#  // https://stackoverflow.com/a/43840128/1689770
-#options.add_argument("--headless")#  // only if you are ACTUALLY running headless
-options.add_argument("--no-sandbox")# //https://stackoverflow.com/a/50725918/1689770
-options.add_argument("--disable-dev-shm-usage")# //https://stackoverflow.com/a/50725918/1689770
-options.add_argument("--disable-browser-side-navigation")# //https://stackoverflow.com/a/49123152/1689770
-options.add_argument("--disable-gpu")
-options.add_argument("--disable-infobars")# //https://stackoverflow.com/a/43840128/1689770
-options.add_argument("--enable-javascript")
 
-options.add_argument(f"--proxy-server={ip}")
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
-driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-    'source': '''
-        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Array:
-        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Promise:
-        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol:
-    '''
-})
 headers = {
     "Accept" : "application/json, text/javascript, */*; q=0.01",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
 }
 
-input_url = input("Введи ссылку c бамперочка без фильтра по годам, без прайса -  ")
-input_year = int(input("С какого года начнем ? - "))
+
+
 input_name = input("Как назовем файл? - ")
-#proxy = input("Введи прокси в формате логин:пароль@46.8.158.109:54376 - ")
+input_page = int(input("С какой странице начнем, ставь 0 если начало - "))
+
 pricing = input("Введи цифру ценообразования от 1 до 5 - ")
-input_price = int(input("От какой суммы собираем в белках? - "))
+#input_price = int(input("От какой суммы собираем в белках? - "))
 
 proxies = {
     'http': f'{proxy}',
     'https': f'{proxy}'
 }
 
-driver.get(url="https://dzen.ru/?yredirect=true")
-time.sleep(30)
-
 summa = 0
 black_list = []
 black_model = []
+cculka = []
 
 file1 = open("black-list.txt", "r")
 while True:
@@ -92,7 +67,10 @@ file1.close
 marka_need_list = {}
 model_need_list = {}       
 
-#https://bamper.by/zchbu/zapchast_steklo-lobovoe/
+#https://bamper.by/zchbu/zapchast_steklo-lobovoe/god_2000-2001/price-ot_150/?more=Y
+with open('zapchastot300_2012.json', encoding="utf-8") as file:
+    zapchast300_999 = json.load(file)
+
 
 
 
@@ -149,25 +127,20 @@ else:
                 "НАЛИЧИЕ",
                 "СРОК ДОСТАВКИ",
                 "ФОТО",
+                "Страница"
             )
         )
 
 with open('prouzbod.json', encoding="utf-8") as file:
     prouz = json.load(file)
-url = f"{input_url}god_{input_year}-2024/price-ot_{input_price}/"
-print(url)
+
+
 
 
 def osnova():
     print(first_page)
-    driver.get(url=first_page)
-    time.sleep(1)
-
-    with open(f"{input_name}.html", "w", encoding="utf-8") as file:
-        file.write(driver.page_source)
-
-    with open(f"{input_name}.html", encoding="utf-8") as file:
-        src = file.read()
+    req = requests.get(url=first_page, headers=headers, proxies=proxies)
+    src = req.text
     soup_1 = BeautifulSoup(src, 'html.parser')
     href_part = soup_1.find_all("div", class_="add-image")
     #print(href_part)
@@ -204,7 +177,7 @@ def osnova():
                 if price >= 5:
                     #print("больше 5")
                     if int(pricing) == 3:
-                        print("Цена в рублях будет по 3-ему ценообразованию")
+                        #print("Цена в рублях будет по 3-ему ценообразованию")
                         if (4<price <20):
                             price_rub = price * 100 + 1500
                         elif price == 20:
@@ -253,6 +226,120 @@ def osnova():
                             price_rub = price * 136
                         elif 1753 <= price :
                             price_rub = price * 135
+                        #print("до сюда дошло")
+                        price_rub -=price_rub %- 100
+                    elif int(pricing) == 2:
+                        #print("Цена в рублях будет по 3-ему ценообразованию")
+                        if (4<price <20):
+                            price_rub = price * 100 + 1500
+                        elif price == 20:
+                            price_rub = price * 142
+                        elif (20 < price <28) :
+                            price_rub = price * (162 -int(price))
+                        elif (28 < price < 30) :
+                            price_rub = price * 134
+                        elif (29 < price < 32) :
+                            price_rub = price * 133
+                        elif (31 < price < 34) :
+                            price_rub = price * 132
+                        elif (33 < price < 36) :
+                            price_rub = price * 131
+                        elif (36 <= price <= 38) :
+                            price_rub = price * 130
+                        elif (39 <= price <= 41) :
+                            price_rub = price * 129
+                        elif (42 <= price <= 44) :
+                            price_rub = price * 128
+                        elif (45 <= price <= 48) :
+                            price_rub = price * 127
+                        elif (49 <= price <= 85) :
+                            price_rub = price * 126
+                        elif (86 <= price <= 93) :
+                            price_rub = price * 125
+                        elif (94 <= price <= 103) :
+                            price_rub = price * 124
+                        elif (104 <= price <= 116) :
+                            price_rub = price * 123
+                        elif (117 <= price <= 130) :
+                            price_rub = price * 122
+                        elif (131 <= price <= 149) :
+                            price_rub = price * 121
+                        elif (150 <= price <= 219) :
+                            price_rub = price * 120
+                        elif (220 <= price <= 1039) :
+                            price_rub = price * 119
+                        elif (1040 <= price <= 1562) :
+                            price_rub = price * 118
+                        elif 1563 <= price :
+                            price_rub = price * 117
+                        #print("до сюда дошло")
+                        price_rub -=price_rub %- 100
+                    elif int(pricing) == 4:
+                        #print("Цена в рублях будет по 3-ему ценообразованию")
+                        if (4<price <20):
+                            price_rub = price * 100 + 1500
+                        elif price == 20:
+                            price_rub = price * 200
+                        elif price == 21:
+                            price_rub = price * 188
+                        elif (21 < price <28) :
+                            price_rub = price * (204 -int(price))
+                        elif (27 < price < 30) :
+                            price_rub = price * 176
+                        elif price == 30:
+                            price_rub = price * 175
+                        elif (30 < price < 33) :
+                            price_rub = price * 174
+                        elif (32 < price < 35) :
+                            price_rub = price * 173
+                        elif (35 <= price <= 36) :
+                            price_rub = price * 172
+                        elif (37 <= price <= 39) :
+                            price_rub = price * 171
+                        elif (40 <= price <= 41) :
+                            price_rub = price * 170
+                        elif (42 <= price <= 44) :
+                            price_rub = price * 169
+                        elif (45 <= price <= 48) :
+                            price_rub = price * 168
+                        elif (49 <= price <= 82) :
+                            price_rub = price * 167
+                        elif (83 <= price <= 89) :
+                            price_rub = price * 166
+                        elif (90 <= price <= 97) :
+                            price_rub = price * 165
+                        elif (98 <= price <= 106) :
+                            price_rub = price * 164
+                        elif (107 <= price <= 116) :
+                            price_rub = price * 163
+                        elif (117 <= price <= 128) :
+                            price_rub = price * 162
+                        elif (129 <= price <= 142) :
+                            price_rub = price * 161
+                        elif (143 <= price <= 198) :
+                            price_rub = price * 160
+                        elif (199 <= price <= 218) :
+                            price_rub = price * 159
+                        elif (219 <= price <= 241) :
+                            price_rub = price * 158
+                        elif (242 <= price <= 346) :
+                            price_rub = price * 157
+                        elif (347 <= price <= 401) :
+                            price_rub = price * 156
+                        elif (402 <= price <= 468) :
+                            price_rub = price * 155
+                        elif (469 <= price <= 649) :
+                            price_rub = price * 154
+                        elif (650 <= price <= 752) :
+                            price_rub = price * 153
+                        elif (753 <= price <= 982) :
+                            price_rub = price * 152
+                        elif (983 <= price <= 1331) :
+                            price_rub = price * 151
+                        elif (1332 <= price <= 1844) :
+                            price_rub = price * 150
+                        elif 1845 <= price :
+                            price_rub = price * 149
                         #print("до сюда дошло")
                         price_rub -=price_rub %- 100
                     else:
@@ -389,7 +476,7 @@ def osnova():
                                 img.paste(watermark,(-230,1), watermark)
                                 img.save(f"{folder_name}/{name_href}.png", format="png")
                                 img_option.close
-                                
+
                                 ftp = ftplib.FTP()
                                 print(f'Conecting to FTP\nHost: {HOST}\nPort: {PORT}')
                                 ftp.connect(HOST, PORT)
@@ -536,7 +623,8 @@ def osnova():
                             price_rub,
                             "под заказ",
                             "2-4 дня",
-                            foto,                                   
+                            foto,
+                            last_page,                                   
                         )
                     )
                     file.close()
@@ -555,139 +643,28 @@ def osnova():
             with requests.request("POST", href_to_zapchast, headers=headers, proxies=proxies) as report:
                 print('report: ', report)
 
-
-
-
-driver.get(url=url)
-time.sleep(1)
-
-with open(f"{input_name}.html", "w", encoding="utf-8") as file:
-    file.write(driver.page_source)
-
-with open(f"{input_name}.html", encoding="utf-8") as file:
-    src = file.read()
-
-soup = BeautifulSoup(src, 'html.parser')
-
-count = soup.find_all("h5", class_="list-title js-var_iCount")
-#print(count)
-try:
-    for item in count:
-        item = str(item)
-        if "<b>" in item:
-            #print(item)
-            num_page = item[item.find("<b>")+3: item.find("</b>")]
-            num_page = int(num_page.replace(" ",""))
-            print(num_page, "Количество запчастей")
-            zapchast = input_url[input_url.find("zapchast_")+ 9 : -1 ]
-            if 0 < num_page <1201:
-                page = int(num_page / 20)
-                
-                if page == 0:
-                    page = 1
-                for i in range(1, page+2):
-                    first_page = f"{input_url}god_{input_year}-2024/price-ot_{input_price}/?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{input_year}-2024%2Fprice-ot_{input_price}&PAGEN_1={i}"
-                    #print("Перед функцией")
+last_page = 0
+for url, page in zapchast300_999.items():
+        #print(url)
+        #print(page)
+    #    https://bamper.by/zchbu/marka_acura/model_ilx/god_2016-2024/price-ot_300/price-do_999/store_y/?more=Y
+        try:
+            mark = url[url.find("marka_")+ 6 : url.find("/model")]
+            mod = url[url.find("model_")+ 6 : url.find("/god")]
+            year1 = url[url.find("/god_")+ 5 : url.find("/price")-5]
+            year2 = url[url.find("/god_")+ 10 : url.find("/price")]
+            #pri = url[url.find("/price") + 10 : url.find("/store")]
+            for i in range(1, int(page)+1):
+                if input_page <= last_page:
+                    last_page += 1
+                    first_page = f"https://bamper.by/zchbu/marka_{mark}/model_{mod}/god_{year1}-{year2}/price-ot_300/price-do_999/store_y/?ACTION=REWRITED3&FORM_DATA=marka_{mark}%2Fmodel_{mod}%2Fgod_{year1}-{year2}%2Fprice-ot_300%2Fprice-do_999%2Fstore_y&more=Y&PAGEN_1={i}"
+                    #print (first_page)
                     osnova()
-            
-            
-            
-            elif 1200 < num_page:
-                for year in range(input_year,2025):
-                    first_url = f"{input_url}god_{year}-{year}/price-ot_{input_price}/"
-                    driver.get(url=first_url)
-                    time.sleep(1)
+                else:
+                    last_page += 1                      
 
-                    with open(f"{input_name}.html", "w", encoding="utf-8") as file:
-                        file.write(driver.page_source)
-
-                    with open(f"{input_name}.html", encoding="utf-8") as file:
-                        src = file.read()
-
-                    soup = BeautifulSoup(src, 'html.parser')
-
-                    count = soup.find_all("h5", class_="list-title js-var_iCount")
-                    #print(count)
-                    for item in count:
-                        item = str(item)
-                        if "<b>" in item:
-                            #print(item)
-                            num_page = item[item.find("<b>")+3: item.find("</b>")]
-                            num_page = int(num_page.replace(" ",""))
-                            print(num_page, "Количество запчастей")
-                            if 0 < num_page <1201:
-                                page = int(num_page / 20)
-                                if page == 0:
-                                    page = 1
-                                for i in range(1, page+2):
-                                    first_page = f"{first_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_{input_price}&more=Y&PAGEN_1={i}"
-                                    #print("Перед функцией")
-                                    osnova()
-                            elif 1200 < num_page:
-                                for do in range (int(input_price)+50,2050,200):
-                                    price_url = f"{input_url}god_{year}-{year}/price-ot_{do-50}/price-do_{do}/"
-                                    driver.get(url=first_url)
-                                    time.sleep(1)
-
-                                    with open(f"{input_name}.html", "w", encoding="utf-8") as file:
-                                        file.write(driver.page_source)
-
-                                    with open(f"{input_name}.html", encoding="utf-8") as file:
-                                        src = file.read()
-
-                                    soup = BeautifulSoup(src, 'html.parser')
-
-                                    count = soup.find_all("h5", class_="list-title js-var_iCount")
-                                    #print(count)
-                                    for item in count:
-                                        item = str(item)
-                                        if "<b>" in item:
-                                            #print(item)
-                                            num_page = item[item.find("<b>")+3: item.find("</b>")]
-                                            num_page = int(num_page.replace(" ",""))
-                                            print(num_page, "Количество запчастей")    
-                                            page = int(num_page / 20)
-                                            if page == 0:
-                                                page = 1
-                                            if page < 61:
-                                                for i in range(1, page+2):
-                                                    first_page = f"{price_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_{do-50}%2Fprice-do_{do}&more=Y&PAGEN_1={i}"
-                                                    #print("Перед функцией")
-                                                    osnova()
-                                            else:
-                                                for i in range(1, 61):
-                                                    first_page = f"{price_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_{do-50}%2Fprice-do_{do}&more=Y&PAGEN_1={i}"
-                                                    #print("Перед функцией")
-                                                    osnova()
-                                price_url = f"{input_url}god_{year}-{year}/price-ot_{int(input_price)+500}/"
-                                driver.get(url=first_url)
-                                time.sleep(1)
-
-                                with open(f"{input_name}.html", "w", encoding="utf-8") as file:
-                                    file.write(driver.page_source)
-
-                                with open(f"{input_name}.html", encoding="utf-8") as file:
-                                    src = file.read()
-
-                                soup = BeautifulSoup(src, 'html.parser')
-
-                                count = soup.find_all("h5", class_="list-title js-var_iCount")
-                                #print(count)
-                                for item in count:
-                                    item = str(item)
-                                    if "<b>" in item:
-                                        #print(item)
-                                        num_page = item[item.find("<b>")+3: item.find("</b>")]
-                                        num_page = int(num_page.replace(" ",""))
-                                        print(num_page, "Количество запчастей")    
-                                        page = int(num_page / 20)
-                                        if page == 0:
-                                            page = 1
-                                        for i in range(1, page+2):
-                                            first_page = f"{price_url}?ACTION=REWRITED3&FORM_DATA=zapchast_{zapchast}%2Fgod_{year}-{year}%2Fprice-ot_500&more=Y&PAGEN_1={i}"
-                                            #print("Перед функцией")
-                                            osnova()
-except Exception:
-    print ("Неизвестная ошибка, что-то с сайтом")
+        except Exception:
+            print ("ошибка при нахождении ссылки или не загрузился сайт бампер")
+    
 
 a = input("Нажмите 1 и ENTER, чтобы закончить это сумасшествие - ")
