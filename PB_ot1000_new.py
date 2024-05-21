@@ -142,10 +142,13 @@ def osnova():
     req = requests.get(url=first_page, headers=headers, proxies=proxies)
     src = req.text
     soup_1 = BeautifulSoup(src, 'html.parser')
+    href_part = []
     href_part = soup_1.find_all("div", class_="add-image")
     #print(href_part)
     for item in href_part:
         item = str(item)
+        novya = ''
+        novya = item
         foto = " "
         version = "    "
         item = item[item.find("href")+7: item.find("target=") -2]
@@ -418,15 +421,7 @@ def osnova():
                     #print(order, "ОРДЕР ЗДЕСЬ")
 
                     #print(info)
-                    if "новый" in info_lower:
-                        status = "новая"
-                    elif "новая" in info_lower:
-                        status = "новая"
-                    elif "новые" in info_lower:
-                        status = "новая"
-                    elif "нов." in info_lower:
-                        status = "новая"
-                    if "новая з/ч" in str(href_part):
+                    if "новая з/ч" in novya:
                         status = "новая"   
                     #print(status, "СТАТУС")
                     
