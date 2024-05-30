@@ -472,18 +472,18 @@ def osnova():
                                 img.save(f"{folder_name}/{name_href}.png", format="png")
                                 img_option.close
 
-                                ftp = ftplib.FTP()
+                                """ftp = ftplib.FTP()
                                 print(f'Conecting to FTP\nHost: {HOST}\nPort: {PORT}')
                                 ftp.connect(HOST, PORT)
                                 print(f'Conecting sucess!\nLogin as: {USER},Pass: 123456')
                                 ftp.login(USER, PASSWORD)  
                                 print('Login Succes!')
                                 #https://bamper.by/zapchast_shleyf-rulya/9676-108946063/
-                                """session = ftplib.FTP(host="171.25.166.53", PORT=3121, user="Reppart", passwd="Nikitos21@Artem")""" 
+                                # session = ftplib.FTP(host="171.25.166.53", PORT=3121, user="Reppart", passwd="Nikitos21@Artem") 
                                 file = open(f"{folder_name}/{name_href}.png", "rb")
                                 ftp.storbinary(f"STOR www/reppart/{name_href}.png", file)
                                 file.close()
-                                ftp.quit()
+                                ftp.quit()"""
                                 #os.remove("img.png")
                                 #print(f"{name_href} - неверный формат или ерунда")
                             except UnidentifiedImageError:
