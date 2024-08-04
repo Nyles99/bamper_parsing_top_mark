@@ -33,7 +33,10 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
 }
 
+service = Service()
 options = webdriver.ChromeOptions()
+
+
 options.add_argument("--disable-blink-features=AutomationControlled")
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 #options.add_experimental_option('useAutomationExtension', False)
@@ -47,9 +50,11 @@ options.add_argument("--disable-browser-side-navigation")# //https://stackoverfl
 options.add_argument("--disable-gpu")
 options.add_argument("--disable-infobars")# //https://stackoverflow.com/a/43840128/1689770
 options.add_argument("--enable-javascript")
+options.add_argument("--log-level=1")
 
+driver = webdriver.Chrome(service = service, options = options)
 #options.add_argument(f"--proxy-server={ip}")
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
 
 driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
     'source': '''
@@ -708,7 +713,7 @@ def osnova():
 if slovo == "да":
     url = "https://bamper.by/catalog/modeli/"
     driver.get(url=url)
-    time.sleep(30)
+    time.sleep(20)
 
     spisok_1 = []
     file1 = open("1.txt", "r", encoding="utf-8")
@@ -753,6 +758,7 @@ if slovo == "да":
             soup = BeautifulSoup(src, 'html.parser')
 
             count = soup.find_all("h5", class_="list-title js-var_iCount")
+            
             #print(count)
             for item in count:
                 item = str(item)
@@ -760,6 +766,7 @@ if slovo == "да":
                     #print(item)
                     num_page = item[item.find("<b>")+3: item.find("</b>")]
                     num_page = int(num_page.replace(" ",""))
+                    print(num_page)
                     summa = summa + num_page
                     if num_page > 0 and num_page < 1201:
                         page = int(num_page / 20) + 1
