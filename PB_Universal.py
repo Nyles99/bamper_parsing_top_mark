@@ -625,6 +625,9 @@ def osnova():
                     U_D = "D"
                 else:
                     U_D = ""
+                if int(price_rub) < 30000:
+                   status = "б/у"
+                model = model.replace('&gt;','')
 
                 text_zzap = f"{marka} {model} {version} {year}г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap_text} Склад: {pricing}_{price}_PB_{num_provider}. {status_new}.".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
                 
@@ -673,8 +676,7 @@ def osnova():
                         last_page,                                   
                     )
                 )"""
-                if int(price_rub) < 30000:
-                   status = "б/у"  
+                  
                 writer.writerow(
                     (
                         num_provider,
@@ -1143,11 +1145,12 @@ if slovo == "да":
                             print(f"Не загрузилась {url_zapchast} - загрузим позже, попробуй обновить вручную в браузере")
                     
                     elif num_page == 0:
+                        page = 0
                         null_or_xz[url_zapchast] = page
                         
             os.remove(f"{1}.html")
         except Exception:
-            print(f"Старница {url_zapchast} отвалилась!!!!!!!!!!!!")
+            print(f"Страница {url_zapchast} отвалилась!!!!!!!!!!!!")
 
     with open("null_or_xz.json", "a", encoding="utf-8") as file:
         json.dump(null_or_xz, file, indent=4, ensure_ascii=False)
