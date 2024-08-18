@@ -704,7 +704,7 @@ def osnova():
                             name_zap,
                             num_zap,
                             one_num_zap,
-                            text_drom,
+                            info_lower,
                             foto,
                             status,
                             last_page,                                       
