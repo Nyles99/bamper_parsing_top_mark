@@ -86,7 +86,7 @@ summa = 0
 black_list = []
 black_model = []
 cculka = []
-book= load_workbook("Ценообразование.xlsx")
+book= load_workbook("Таблица поставщиков.xlsx")
 sheet= book["Лист1"]
 
 file1 = open("black-list.txt", "r")
@@ -223,7 +223,7 @@ def osnova():
         #print(num_provider)
         if num_provider not in black_list:
             for i in range(2, 2000):
-                providers = str(sheet["B"+ str(i)].value)
+                providers = str(sheet["D"+ str(i)].value)
                 if num_provider == providers:
                     price_create = str(sheet["C"+ str(i)].value)
                 else:
@@ -754,6 +754,7 @@ if slovo == "да":
     zapchast00_1200 = {}
     zapchast1200 = {}
     null_or_xz = {}
+    noload = {}
     n=1
 
     for url in spisok_1:
@@ -912,6 +913,8 @@ if slovo == "да":
                                                                             zapchast1200[url_zapchast] = page
                                                                         elif num_page == 0:
                                                                             print(url_zapchast, "Страница с нулевым значением нам не нужна")
+                                                                            page = 0
+                                                                            null_or_xz[url_zapchast] = page
                                                                 url_zapchast = f"{part_one}{first}/price-do_{second}{part_two}"
                                                                 driver.get(url=url_zapchast)
                                                                 time.sleep(1)
@@ -942,6 +945,8 @@ if slovo == "да":
                                                                             zapchast1200[url_zapchast] = page
                                                                         elif num_page == 0:
                                                                             print(url_zapchast, "Страница с нулевым значением нам не нужна")
+                                                                            page = 0
+                                                                            null_or_xz[url_zapchast] = page
                                                                 url_zapchast = f"{part_one}{second}/price-do_{do}{part_two}"
                                                                 driver.get(url=url_zapchast)
                                                                 time.sleep(1)
@@ -972,8 +977,12 @@ if slovo == "да":
                                                                             zapchast1200[url_zapchast] = page
                                                                         elif num_page == 0:
                                                                             print(url_zapchast, "Страница с нулевым значением нам не нужна")
+                                                                            page = 0
+                                                                            null_or_xz[url_zapchast] = page
                                                         elif num_page == 0:
                                                             print(url_zapchast, "Страница с нулевым значением нам не нужна")
+                                                            page = 0
+                                                            null_or_xz[url_zapchast] = page
                                                         else:
                                                             #null_or_xz[url_zapchast] = page
                                                             print("Страница записалась в отдельный список")
@@ -981,11 +990,15 @@ if slovo == "да":
                                                 os.remove("excample.html")
                                             except Exception:
                                                 print(f"Не загрузилась {url_zapchast} - загрузим позже, попробуй обновить вручную в браузере")
+                                                page = "xz"
+                                                noload[url_zapchast] = page
                                     elif num_page == 0:
                                         zapchast00_1200[url_zapchast] = page
                                 
                         except Exception:
                             print(f"Не загрузилась {url_zapchast} - загрузим позже, попробуй обновить вручную в браузере")
+                            page = "xz"
+                            noload[url_zapchast] = page
                         
                         url_zapchast = f"{first_part}{int(first_year)+1}-{end_year_start}{second_part}"
                         
@@ -1095,6 +1108,8 @@ if slovo == "да":
                                                                             zapchast1200[url_zapchast] = page
                                                                         elif num_page == 0:
                                                                             print(url_zapchast, "Страница с нулевым значением нам не нужна")
+                                                                            page = 0
+                                                                            null_or_xz[url_zapchast] = page
                                                                 url_zapchast = f"{part_one}{first}/price-do_{second}{part_two}"
                                                                 driver.get(url=url_zapchast)
                                                                 time.sleep(1)
@@ -1125,6 +1140,8 @@ if slovo == "да":
                                                                             zapchast1200[url_zapchast] = page
                                                                         elif num_page == 0:
                                                                             print(url_zapchast, "Страница с нулевым значением нам не нужна")
+                                                                            page = 0
+                                                                            null_or_xz[url_zapchast] = page
                                                                 url_zapchast = f"{part_one}{second}/price-do_{do}{part_two}"
                                                                 driver.get(url=url_zapchast)
                                                                 time.sleep(1)
@@ -1155,15 +1172,23 @@ if slovo == "да":
                                                                             zapchast1200[url_zapchast] = page
                                                                         elif num_page == 0:
                                                                             print(url_zapchast, "Страница с нулевым значением нам не нужна")
+                                                                            page = 0
+                                                                            null_or_xz[url_zapchast] = page
                                                         elif num_page == 0:
                                                             print(url_zapchast, "Страница с нулевым значением нам не нужна")
+                                                            page = 0
+                                                            null_or_xz[url_zapchast] = page
 
                                                 os.remove("excample.html")
                                             except Exception:
                                                 print(f"Не загрузилась {url_zapchast} - загрузим позже, попробуй обновить вручную в браузере")
+                                                page = "xz"
+                                                noload[url_zapchast] = page
                                 
                         except Exception:
                             print(f"Не загрузилась {url_zapchast} - загрузим позже, попробуй обновить вручную в браузере")
+                            page = "xz"
+                            noload[url_zapchast] = page
                     
                     elif num_page == 0:
                         page = 0
@@ -1172,6 +1197,8 @@ if slovo == "да":
             os.remove(f"{1}.html")
         except Exception:
             print(f"Страница {url_zapchast} отвалилась!!!!!!!!!!!!")
+            page = "xz"
+            noload[url_zapchast] = page
 
     with open("null_or_xz.json", "a", encoding="utf-8") as file:
         json.dump(null_or_xz, file, indent=4, ensure_ascii=False)
@@ -1181,6 +1208,8 @@ if slovo == "да":
 
     with open("zapchastot60_1200.json", "a", encoding="utf-8") as file:
         json.dump(zapchast1200, file, indent=4, ensure_ascii=False)
+    with open("noload.json", "a", encoding="utf-8") as file:
+        json.dump(noload, file, indent=4, ensure_ascii=False)
 
 
     print(summa)
